@@ -85,6 +85,7 @@ class JoongangCrawler extends Crawler {
 
     parseNewsText(body) {
         let $ = cheerio.load(body);
+        $('div').find("#articlebody").find('br').replaceWith('\n');
         return $('div').find("#articlebody").text().trim();
     }
 

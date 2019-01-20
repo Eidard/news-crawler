@@ -96,6 +96,7 @@ class HeraldCrawler extends Crawler {
 
     parseNewsText(body) {
         let $ = cheerio.load(body);
+        $('div').find("#articleText").find('br').replaceWith('\n');
         return $('div').find("#articleText").text().trim();
     }
     
