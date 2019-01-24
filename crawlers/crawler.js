@@ -41,7 +41,7 @@ class Crawler {
             });
             obs$.subscribe({
                 // 뉴스 목록 추가
-                next: newsList => crawler.argList = crawler.argList.concat(newsList),
+                next: newsList => crawler.argList = newsList.concat(crawler.argList),
                 // 에러 처리 (server will stop)
                 error: err => { console.log(err); reqCallback(1); },
                 // DB에 저장
@@ -102,7 +102,7 @@ class Crawler {
                                     reqObs.complete();
                                     return;
                                 }
-                                let filename = `${crawler.newspaper}${crawler.newsCategory}${crawler.newsDivision}${newsDate}-${i}.txt`;
+                                let filename = `${crawler.newspaper}${crawler.newsCategory}${crawler.newsDivision}${newsDate}-${newsTitle}.txt`;
                                 let newsText = crawler.parseNewsText(body);
                                 s3.putText(filename, newsText, () => {
                                     let news = [newsUrl, crawler.newspaper, crawler.newsCategory, crawler.newsDivision, newsDate, newsTitle, filename];
@@ -111,7 +111,7 @@ class Crawler {
                                 });
                             });
                         });
-                        obsList.push(obs$);
+                        obsList.unshift(obs$);
                     }
                 }
             } //for

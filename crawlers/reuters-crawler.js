@@ -41,7 +41,7 @@ class ReutersCrawler extends Crawler {
         let n = pTags.length;
         let text = "";
         for (let i = 0; i < n; i++) {
-            text += pTags.eq(i).text().trim() + "\n\n";
+            text += pTags.eq(i).text().trim() + "\r\n";
         }
         return text;
     }
