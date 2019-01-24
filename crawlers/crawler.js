@@ -1,5 +1,5 @@
 const { Observable, from } = require('rxjs'); //콜백관리
-const { concatAll } = require('rxjs/operators'); //콜백관리
+const { mergeAll } = require('rxjs/operators'); //콜백관리
 const request = require('request'); //http request
 
 const Database = require('./../services/database');
@@ -117,7 +117,7 @@ class Crawler {
             } //for
 
             const obsList$ = from(obsList);
-            const reqs$ = obsList$.pipe(concatAll());
+            const reqs$ = obsList$.pipe(mergeAll());
 
             let newsList = [];
             reqs$.subscribe({
