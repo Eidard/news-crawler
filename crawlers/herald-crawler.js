@@ -98,7 +98,7 @@ class HeraldCrawler extends Crawler {
         let $ = cheerio.load(body);
 	let $text = $('div#articleText');
 	$text.find('br').replaceWith('\n');
-        return $text.text().replace(/\n\n+/gi, '\n').trim();
+        return $text.text().replace(/\n\n+/gi, '\r\n').trim();
     }
     
     formatDate(date) {

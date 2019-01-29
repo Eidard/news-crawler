@@ -2,15 +2,16 @@
 const AWS = require('aws-sdk');
 const formidable = require('formidable');
 const fs = require('fs');
-
+const mkdirp = require('mkdirp');
 
 class FileManager {
 
     constructor() {
+        AWS.config.region = 'ap-northeast-2';
         this.s3 = new AWS.S3();
         this.params = {
             Bucket: 'cloud.ils.hansung.ac.kr',
-            Key: '/newsText',
+            Key: null,
             ACL: 'public-read',
             Body: null
         };
@@ -21,18 +22,16 @@ class FileManager {
         });
     }
 
-    putText(filename, text, callback) {
-        this.textToTextfile(filename, text, path => {
+    putText(filepath, filename, text, callback) {
+        this.textToTextfile(filepath, filename, text, path => {
             callback();
-            //TODO S3 저장
-            // this.form.parse(textFile, (err, fields, files) => {
-            //     if (err) throw err;
-            //     this.params.Body = fs.createReadStream(path);
-            //     this.s3.upload(params, (err, result) => {
-            //         if (err) throw err;
-            //         callback();
-            //     });
-            // });
+     
+            // S3 저장
+            this.params.Key = `newsText/${filepath}/${filename}`;
+            this.params.Body = fs.createReadStream(path);
+            this.s3.upload(this.params, (err, result) => {
+                callback(result.Location);
+            });
         });
     }
 
@@ -42,14 +41,16 @@ class FileManager {
         });
     }
 
-    textToTextfile(filename, text, callback) {
-        const path = `./resources/newsText/${filename}`;
-        fs.writeFile(path, text, 'utf-8', err => {
-            if (err) {
-                callback(null);
-            } else {
-                callback(path);
-            }
+    textToTextfile(filepath, filename, text, callback) {
+        const path = `./resources/newsText/${filepath}`;
+        mkdirp(path, err => {
+            fs.writeFile(`${path}/${filename}`, text, 'utf-8', err => {
+                if (err) {
+                    callback(null);
+                } else {
+                    callback(`${path}/${filename}`);
+                }
+            });
         });
     }
 

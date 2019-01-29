@@ -91,7 +91,7 @@ class Crawler {
                 let newsUrl = rows[i][1];
                 let newsDate = rows[i][2];
 
-                console.log(`${newsDate} in ${crawler.startDate} ~ ${crawler.endDate}`);
+                console.log(`${page}page ... ${newsDate} in ${crawler.startDate} ~ ${crawler.endDate}`);
                 if (newsDate >= crawler.startDate) { //크롤링 계속
                     if (newsDate <= crawler.endDate) {
                         let obs$ = Observable.create(function(reqObs) {
@@ -102,10 +102,16 @@ class Crawler {
                                     reqObs.complete();
                                     return;
                                 }
-                                let filename = `${crawler.newspaper}${crawler.newsCategory}${crawler.newsDivision}${newsDate}-${newsTitle}.txt`;
+                                let filepath;
+                                if (crawler.newsDivision != undefined) {
+                                    filepath = `${crawler.newspaper}/${crawler.newsCategory}/${crawler.newsDivision}`;
+                                } else {
+                                    filepath = `${crawler.newspaper}/${crawler.newsCategory}`;
+                                }
+                                let filename = `${newsDate}-${newsTitle}.txt`;
                                 let newsText = crawler.parseNewsText(body);
-                                s3.putText(filename, newsText, () => {
-                                    let news = [newsUrl, crawler.newspaper, crawler.newsCategory, crawler.newsDivision, newsDate, newsTitle, filename];
+                                s3.putText(filepath, filename, newsText, fileurl => {
+                                    let news = [newsUrl, crawler.newspaper, crawler.newsCategory, crawler.newsDivision, newsDate, newsTitle, `${filepath}/${filename}`];
                                     reqObs.next(news);
                                     reqObs.complete();
                                 });
