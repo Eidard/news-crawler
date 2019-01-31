@@ -46,6 +46,7 @@ class FileManager {
         mkdirp(path, err => {
             fs.writeFile(`${path}/${filename}`, text, 'utf-8', err => {
                 if (err) {
+                    console.log(err);
                     callback(null);
                 } else {
                     callback(`${path}/${filename}`);

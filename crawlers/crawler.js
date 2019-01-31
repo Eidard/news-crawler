@@ -87,7 +87,7 @@ class Crawler {
             let obsList = [];
 
             for (let i = 0; i < rows.length; i++) {
-                let newsTitle = rows[i][0];
+                let newsTitle = rows[i][0].replace(/\//g, '\|').replace(/\+/g, 'plus').replace(/\-/g, 'minus').trim();
                 let newsUrl = rows[i][1];
                 let newsDate = rows[i][2];
 
