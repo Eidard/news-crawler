@@ -3,271 +3,310 @@
 	<meta charset="utf-8">
 	<title>English Corpus Construction</title>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
+
+	<!-- bootstrap4 -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+
+	<!-- font awesome 5 -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 </head>
 
 <body>
-	<h2>영어 신문 기사 수집 도구</h2>
-	<hr><!-- ============================================================================== -->
 
-	<fieldset>
-		<legend>신문사</legend>
-		<select id="newsName" onchange="changeNewsCategory()">
+<div class="container-fluid text-center">
+	<a href='#' style="text-decoration: none;"><h2>영어 신문 기사 수집 도구</h2></a>
+</div>
+
+<div class="jumbotron" style="padding: 20px 60px 20px 60px">
+	<label for="newsName"><h5>신문 / 분야</h5></label>
+	<div class="form-inline">
+		<select class="form-control mr-sm-2" id="newsName" onchange="changeNewsCategory()">
 			<option value="joongang">데일리 중앙</option>
 			<option value="herald">코리아헤럴드</option>
 			<!--<option value="mk">매일경제</option>-->
 			<option value="reuters">로이터</option>
 		</select>
-		<br><br>
-		<legend>분야</legend>
-		<select id="newsCategory" onchange="changeNewsDivision()"></select>
-		<select id="newsDivision"></select>
-	</fieldset>
-	<fieldset>
-		<legend>기간</legend>
-		<input id="startDate" type="date" value="">
-		<input id="endDate" type="date" value="">
-	</fieldset>
+		<select class="form-control mr-sm-2" id="newsCategory" onchange="changeNewsDivision()"></select>
+		<select class="form-control mr-sm-2" id="newsDivision"></select>
+	</div>
 	<br>
-	<center><button type="button" onclick="getNews(this)">검색</button></center>
-	<hr><!-- ============================================================================== -->
+	<label for="startDate"><h5>기간</h5></label>
+	<div class="form-inline">
+		<input class="form-control mr-sm-2" id="startDate" type="date" value="">
+		<input class="form-control mr-sm-2" id="endDate" type="date" value="">
+		<button type="button" class="btn btn-primary" onclick="getNews(this)">검색</button>
+	</div>
+</div>
 
-	<div id="content" style="margin: 10px"></div>
-	<hr><!-- ============================================================================== -->
+<h4><div class="container-fluid" id="title" style="padding: 0px 20px 10px 20px"></div></h4>
+<div class="container-fluid" id="content" style="font-size: 16.5px; letter-spacing: 1.8; word-spacing: 1.8; line-height: 1.8; padding: 10px 20px 0px 20px"></div>
 
-	<table id="list">
+<br>
+
+<div class="container-fluid">
+	<table class="table table-bordered" id="list">
 		<tr>
-			<th>id</th><th>제목</th><th>신문사</th><th>상위 분류</th><th>하위 분류</th><th>날짜</th>
+			<th>id</th><th>제목</th><th>신문사</th><th>상위 분류</th><th>하위 분류</th><th>날짜</th><th>TXT</th>
 		</tr>
 	</table>
-	<div id="page"></div>
+	<div id="page" style="padding: 0px 20px 20px 20px"></div>
+</div>
 
-	<script type="text/javascript">
-		const categories = {
-			'herald': ['National', 'Business', 'Life&Style', 'Entertainment', 'Sports', 'World'],
-			'joongang': ['National', 'Business', 'Opinion', 'Curlture', 'Sports', 'Foreign community'],
-			'mk': ['Biz&Company', 'Tech', 'Market', 'Economy', 'Seoul', 'Asia', 'Analysis'],
-			'reuters': ['Banks', 'Business News', 'Politics', 'Supreme Court', 'U.S']
+<footer class="container-fluid text-center" style="background-color: #f2f2f2; padding: 25px">
+	<p>SDKIM-ORG Copyright</p>
+</footer>
+
+<!-- script -->
+<script type="text/javascript">
+	const categories = {
+		'herald': ['National', 'Business', 'Life&Style', 'Entertainment', 'Sports', 'World'],
+		'joongang': ['National', 'Business', 'Opinion', 'Curlture', 'Sports', 'Foreign community'],
+		'mk': ['Biz&Company', 'Tech', 'Market', 'Economy', 'Seoul', 'Asia', 'Analysis'],
+		'reuters': ['Banks', 'Business News', 'Politics', 'Supreme Court', 'U.S']
+	};
+	const divisions = {
+		'herald': {
+			'National': ['Politics', 'Social Affairs', 'Foreign Affairs', 'Defense', 'North Korea', 'Science', 'Diplomatic Circuit', 'Education'],
+			'Business': ['Economy', 'Finance', 'Industry', 'Technology', 'Automode'],
+			'Life&Style': ['Culture', 'Travel', 'Fashion', 'Food&Beverage', 'Books', 'People', 'Expat Living', 'Arts&Design', 'Health'],
+			'Entertainment': ['Film', 'Television', 'Music', 'Theater'],
+			'Sports': ['Soccer', 'Baseball', 'Golf', 'More Sports'],
+			'World': ['World News', 'World Business', 'Asia News Network']
+		},
+		'joongang': {
+			'National': ['Politics', 'Social affairs', 'Education', 'People', 'Special Series'],
+			'Business': ['Economy', 'Finance', 'Industry', 'Stock Market', 'Special Series', 'Sponsored Report'],
+			'Opinion': ['Editorials', 'Columns', 'Fountain', 'Cartoons', 'Letters'],
+			'Curlture': ['Features', 'Arts', 'Entertainment', 'Style & Travel', 'Movie', 'Korean Heritage', 'Ticket', 'Music & Performance'],
+			'Sports': ['Domestic', 'International', 'Special Series'],
+			'Foreign community': ['Activities', 'Special Series']
+		},
+		'mk': {'Biz&Company': ['-'], 'Tech': ['-'], 'Market': ['-'], 'Economy': ['-'], 'Seoul': ['-'], 'Asia': ['-'], 'Analysis': ['-']},
+		'reuters': {'Banks': ['-'], 'Business News': ['-'], 'Politics': ['-'], 'Supreme Court': ['-'], 'U.S': ['-']}
+	};
+	const selNewsName = document.getElementById('newsName');
+	const selCategory = document.getElementById('newsCategory');
+	const selDivision = document.getElementById('newsDivision');
+
+	/* execute */
+	selNewsName.selectedIndex = 0;
+	changeNewsCategory();
+	list(null, 1);
+
+
+	/* View Control */
+	function changeNewsCategory() {
+		// clear
+		while (selCategory.options.length)
+			selCategory.remove(0);
+
+		// add options
+		const newsName = selNewsName.options[selNewsName.selectedIndex].value;
+		categories[newsName].forEach(category => {
+			let option = new Option(category, category);
+			selCategory.options.add(option);
+		});
+
+		// set default
+		if (selCategory.length > 0) {
+			selCategory.selectedIndex = 0;
+			changeNewsDivision();
+		}
+	}
+
+	function changeNewsDivision() {
+		// clear
+		while (selDivision.options.length)
+			selDivision.remove(0);
+
+		// add options
+		const newsName = selNewsName.options[selNewsName.selectedIndex].value;
+		const newsCategory = selCategory.options[selCategory.selectedIndex].value;
+		divisions[newsName][newsCategory].forEach(division => {
+			let option = new Option(division, division);
+			selDivision.options.add(option);
+		});
+
+		// set default
+		if (selDivision.length > 0) {
+			selDivision.selectedIndex = 0;
+		}
+	}
+
+
+	/* Http Server */
+	function connect(type, dest, callback) { //ajax http 연결
+		var xmlhttp;
+		if (window.XMLHttpRequest)
+			xmlhttp = new XMLHttpRequest(); // code for modern browsers
+		else
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP"); // code for old IE browsers
+
+		xmlhttp.onreadystatechange = function() {
+			callback(xmlhttp.readyState, xmlhttp.status, xmlhttp.response);
 		};
-		const divisions = {
-			'herald': {
-				'National': ['Politics', 'Social Affairs', 'Foreign Affairs', 'Defense', 'North Korea', 'Science', 'Diplomatic Circuit', 'Education'],
-				'Business': ['Economy', 'Finance', 'Industry', 'Technology', 'Automode'],
-				'Life&Style': ['Culture', 'Travel', 'Fashion', 'Food&Beverage', 'Books', 'People', 'Expat Living', 'Arts&Design', 'Health'],
-				'Entertainment': ['Film', 'Television', 'Music', 'Theater'],
-				'Sports': ['Soccer', 'Baseball', 'Golf', 'More Sports'],
-				'World': ['World News', 'World Business', 'Asia News Network']
-			},
-			'joongang': {
-				'National': ['Politics', 'Social affairs', 'Education', 'People', 'Special Series'],
-				'Business': ['Economy', 'Finance', 'Industry', 'Stock Market', 'Special Series', 'Sponsored Report'],
-				'Opinion': ['Editorials', 'Columns', 'Fountain', 'Cartoons', 'Letters'],
-				'Curlture': ['Features', 'Arts', 'Entertainment', 'Style & Travel', 'Movie', 'Korean Heritage', 'Ticket', 'Music & Performance'],
-				'Sports': ['Domestic', 'International', 'Special Series'],
-				'Foreign community': ['Activities', 'Special Series']
-			},
-			'mk': {'Biz&Company': ['-'], 'Tech': ['-'], 'Market': ['-'], 'Economy': ['-'], 'Seoul': ['-'], 'Asia': ['-'], 'Analysis': ['-']},
-			'reuters': {'Banks': ['-'], 'Business News': ['-'], 'Politics': ['-'], 'Supreme Court': ['-'], 'U.S': ['-']}
-		};
-		const selNewsName = document.getElementById('newsName');
-		const selCategory = document.getElementById('newsCategory');
-		const selDivision = document.getElementById('newsDivision');
 
-		/* execute */
-		selNewsName.selectedIndex = 0;
-		changeNewsCategory();
-		list(null, 1);
+		xmlhttp.open(type, dest, true); //open url
+		xmlhttp.send();
+	}
 
+	function getNews(view) { //뉴스 업데이트 요청
+		view.disabled = true;
 
-		/* View Control */
-		function changeNewsCategory() {
-			// clear
-			while (selCategory.options.length)
-				selCategory.remove(0);
+		const newsName = selNewsName.options[selNewsName.selectedIndex].value;
+		const newsCategory = selCategory.options[selCategory.selectedIndex].value;
+		const newsDivision = selDivision.options[selDivision.selectedIndex].value;
+		const startDate = document.getElementById("startDate").value;
+		const endDate = document.getElementById("endDate").value;
+		const dest = `news/${newsName}?newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
 
-			// add options
-			const newsName = selNewsName.options[selNewsName.selectedIndex].value;
-			categories[newsName].forEach(category => {
-				let option = new Option(category, category);
-				selCategory.options.add(option);
+		connect("GET", dest, function(readyState, status, response) {
+				view.disabled = false;
+				if (readyState != 4 || status != 200) return;
+				list(null, 1);
 			});
+	}
 
-			// set default
-			if (selCategory.length > 0) {
-				selCategory.selectedIndex = 0;
-				changeNewsDivision();
-			}
-		}
-
-		function changeNewsDivision() {
-			// clear
-			while (selDivision.options.length)
-				selDivision.remove(0);
-
-			// add options
-			const newsName = selNewsName.options[selNewsName.selectedIndex].value;
-			const newsCategory = selCategory.options[selCategory.selectedIndex].value;
-			divisions[newsName][newsCategory].forEach(division => {
-				let option = new Option(division, division);
-				selDivision.options.add(option);
-			});
-
-			// set default
-			if (selDivision.length > 0) {
-				selDivision.selectedIndex = 0;
-			}
-		}
-
-
-		/* Http Server */
-		function connect(type, dest, callback) { //ajax http 연결
-			var xmlhttp;
-			if (window.XMLHttpRequest)
-				xmlhttp = new XMLHttpRequest(); // code for modern browsers
-			else
-				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP"); // code for old IE browsers
-
-			xmlhttp.onreadystatechange = function() {
-				callback(xmlhttp.readyState, xmlhttp.status, xmlhttp.response);
-			};
-
-			xmlhttp.open(type, dest, true); //open url
-			xmlhttp.send();
-		}
-
-		function getNews(view) { //뉴스 업데이트 요청
+	function list(view, page) { //페이지의 뉴스 목록을 가져온다.
+		if (view != null)
 			view.disabled = true;
 
-			const newsName = selNewsName.options[selNewsName.selectedIndex].value;
-			const newsCategory = selCategory.options[selCategory.selectedIndex].value;
-			const newsDivision = selDivision.options[selDivision.selectedIndex].value;
-			const startDate = document.getElementById("startDate").value;
-			const endDate = document.getElementById("endDate").value;
-			const dest = `news/${newsName}?newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
+		/* Get news count */
+		let count, size;
+		let dest = `news/count`;
+		connect("GET", dest, function(readyState, status, response) {
+			if (readyState != 4 || status != 200) return;
+			count = response;
+			size = 10;
 
+			const btnGroup = document.getElementById("page");
+			while (btnGroup.firstChild)
+				btnGroup.removeChild(btnGroup.firstChild);
+
+			var s = page - 4;
+			if (s < 1) s = 1;
+			var e = s + size;
+			if (e > count / size + 1) e = count / size + 1;
+			for (let i = s; i < e; i++) {
+				/* Bind */
+				var btn;
+				btn = document.createElement("BUTTON");
+
+				/* Set btn */
+				btn.innerText = i;
+				btn.style.margin = '3px 3px 3px 3px';
+				btn.onclick = function(e) {
+					list(view, i);
+				};
+				btn.className = (i==page)? 'btn btn-primary' : 'btn btn-outline-primary';
+
+				/* Append */
+				btnGroup.appendChild(btn);
+			}
+
+			/* Get news list */
+			dest = `news/list?page=${page}&size=${size}`;
 			connect("GET", dest, function(readyState, status, response) {
-					view.disabled = false;
 					if (readyState != 4 || status != 200) return;
-					list(null, 1);
+
+					let rows = JSON.parse(response);
+
+					const table = document.getElementById("list");
+					//id  url  newspaper  category  division  date  title
+					while (table.childElementCount > 1)
+						table.removeChild(table.lastChild);
+
+					for (let i = 0; i < rows.length; i++) {
+						/* Bind */
+						let tr = document.createElement("TR");
+						let tdId = document.createElement("TD");
+						let tdTit = document.createElement("TD");
+						let aTitUrl = document.createElement("A");
+						let tdNp = document.createElement("TD");
+						let tdCat = document.createElement("TD");
+						let tdDiv = document.createElement("TD");
+						let tdDat = document.createElement("TD");
+						let tdTxt = document.createElement("TD");
+						let aTxtUrl = document.createElement("A");
+						let iTxtIcon = document.createElement("I");
+
+						/* Set row */
+						let row = rows[i];
+						tdId.innerText = row.id;
+						aTitUrl.innerText = row.title;
+						aTitUrl.href = row.url;
+						tdNp.innerText = row.newspaper;
+						tdCat.innerText = row.category;
+						tdDiv.innerText = row.division;
+						tdDat.innerText = row.date;
+						aTxtUrl.href = `https://s3.ap-northeast-2.amazonaws.com/cloud.ils.hansung.ac.kr/newsText/${row.newspaper}/${row.category}/${row.division}/${row.date}-${row.title}.txt`;
+						iTxtIcon.className = 'far fa-file-alt';
+						iTxtIcon.style = 'font-size:24px';
+
+						tr.onclick = function(e) {
+								loadContent(row.id, row.title);
+							};
+						
+						tr.onmouseover = function(e) {
+								tr.style.backgroundColor = 'DodgerBlue';
+								tr.style.color = 'White';
+								aTitUrl.style.color = 'White';
+								aTxtUrl.style.color = 'White';
+							};
+						tr.onmouseout = function(e) {
+								tr.style.backgroundColor = 'White';
+								tr.style.color = '';
+								aTitUrl.style.color = '';
+								aTxtUrl.style.color = '';
+							};
+
+						/* Append */
+						tr.appendChild(tdId);
+						tdTit.appendChild(aTitUrl);
+						tr.appendChild(tdTit);
+						tr.appendChild(tdNp);
+						tr.appendChild(tdCat);
+						tr.appendChild(tdDiv);
+						tr.appendChild(tdDat);
+						aTxtUrl.appendChild(iTxtIcon);
+						tdTxt.appendChild(aTxtUrl);
+						tr.appendChild(tdTxt);
+						table.appendChild(tr);
+					}
+
+					if (view != null)
+						view.disabled = false;
 				});
-		}
+			});
+	}
 
-		function list(view, page) { //페이지의 뉴스 목록을 가져온다.
-			if (view != null)
-				view.disabled = true;
-
-			/* Get news count */
-			let count, size;
-			let dest = `news/count`;
-			connect("GET", dest, function(readyState, status, response) {
+	function loadContent(id, title) { //뉴스 내용을 가져온다.
+		/* Get news text */
+		let dest = `news/content?id=${id}`;
+		connect("GET", dest, function(readyState, status, response) {
 				if (readyState != 4 || status != 200) return;
-				count = response;
-				size = 10;
 
-				const btnGroup = document.getElementById("page");
-				while (btnGroup.firstChild)
-					btnGroup.removeChild(btnGroup.firstChild);
+				let text = response;
 
-				var s = page - 4;
-				if (s < 1) s = 1;
-				var e = s + size;
-				if (e > count / size + 1) e = count / size + 1;
-				for (let i = s; i < e; i++) {
-					/* Bind */
-					var btn;
-					btn = document.createElement("BUTTON");
+				/* Bind */
+				const divTitle = document.getElementById("title");
+				while (divTitle.firstChild)
+					divTitle.removeChild(divTitle.firstChild);
+				const divContent = document.getElementById("content");
+				while (divContent.firstChild)
+					divContent.removeChild(divContent.firstChild);
 
-					/* Set btn */
-					btn.innerText = i;
-					btn.style.margin = '3px 3px 3px 3px';
-					btn.onclick = function(e) {
-						list(view, i);
-					};
-					if (i == page)
-						btn.disabled = true;
+				/* Set text */
+				divTitle.innerText = title;
+				divContent.innerText = text;
+			});
+	}
 
-					/* Append */
-					btnGroup.appendChild(btn);
-				}
-
-				/* Get news list */
-				dest = `news/list?page=${page}&size=${size}`;
-				connect("GET", dest, function(readyState, status, response) {
-						if (readyState != 4 || status != 200) return;
-
-						let rows = JSON.parse(response);
-
-						const table = document.getElementById("list");
-						//id  url  newspaper  category  division  date  title
-						while (table.childElementCount > 1)
-							table.removeChild(table.lastChild);
-
-						for (let i = 0; i < rows.length; i++) {
-							/* Bind */
-							let tr = document.createElement("TR");
-							let tdId = document.createElement("TD");
-							let tdTit = document.createElement("TD");
-							let aUrl = document.createElement("A");
-							let tdNp = document.createElement("TD");
-							let tdCat = document.createElement("TD");
-							let tdDiv = document.createElement("TD");
-							let tdDat = document.createElement("TD");
-
-							/* Set row */
-							let row = rows[i];
-							tdId.innerText = row.id;
-							aUrl.innerText = row.title;
-							aUrl.href = row.url;
-							tdNp.innerText = row.newspaper;
-							tdCat.innerText = row.category;
-							tdDiv.innerText = row.division;
-							tdDat.innerText = row.date;
-
-							tr.onclick = function(e) {
-									loadContent(row.id);
-								};
-							tr.onmouseover = function(e) {
-									tr.style.backgroundColor = 'LightCyan';
-								};
-							tr.onmouseout = function(e) {
-									tr.style.backgroundColor = 'White';
-								};
-
-							/* Append */
-							tr.appendChild(tdId);
-							tdTit.appendChild(aUrl);
-							tr.appendChild(tdTit);
-							tr.appendChild(tdNp);
-							tr.appendChild(tdCat);
-							tr.appendChild(tdDiv);
-							tr.appendChild(tdDat);
-							table.appendChild(tr);
-						}
-
-						if (view != null)
-							view.disabled = false;
-					});
-				});
-		}
-
-		function loadContent(id) { //뉴스 내용을 가져온다.
-			/* Get news text */
-			let dest = `news/content?id=${id}`;
-			connect("GET", dest, function(readyState, status, response) {
-					if (readyState != 4 || status != 200) return;
-
-					let text = response;
-
-					/* Bind */
-					const divContent = document.getElementById("content");
-					while (divContent.firstChild)
-						divContent.removeChild(divContent.firstChild);
-
-					/* Set text */
-					divContent.innerText = text;
-				});
-		}
-
-    </script>
+</script>
 
 </body>
 </html>

@@ -1,8 +1,8 @@
-table {
-    border-collapse: collapse;
+tr {
+    text-align: center;
 }
 
-table, th, td {
-    text-align: center;
-    border: 1px solid black;
+td:hover {
+    cursor: pointer;
 }
+
