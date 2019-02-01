@@ -17,8 +17,8 @@
 
 <body>
 
-<div class="container-fluid text-center">
-	<a href='#' style="text-decoration: none;"><h2>영어 신문 기사 수집 도구</h2></a>
+<div class="container-fluid text-center" style="padding: 20px 20px 20px 20px">
+	<a href='#' style="color: black; text-decoration: none"><h2>영어 신문 기사 수집 도구</h2></a>
 </div>
 
 <div class="jumbotron" style="padding: 20px 60px 20px 60px">
@@ -48,12 +48,15 @@
 <br>
 
 <div class="container-fluid">
+	<div id="n_list"></div>
 	<table class="table table-bordered" id="list">
 		<tr>
 			<th>id</th><th>제목</th><th>신문사</th><th>상위 분류</th><th>하위 분류</th><th>날짜</th><th>TXT</th>
 		</tr>
 	</table>
-	<div id="page" style="padding: 0px 20px 20px 20px"></div>
+	<span class="link" onclick="list(null, 1)">처음으로</span>
+	<span class="link" id="go_last_page" onclick="list(null, 1)" style="padding: 5px">마지막으로</span>
+	<div class="text-center" id="page" style="padding: 0px 20px 20px 20px"></div>
 </div>
 
 <footer class="container-fluid text-center" style="background-color: #f2f2f2; padding: 25px">
@@ -155,8 +158,6 @@
 	}
 
 	function getNews(view) { //뉴스 업데이트 요청
-		view.disabled = true;
-
 		const newsName = selNewsName.options[selNewsName.selectedIndex].value;
 		const newsCategory = selCategory.options[selCategory.selectedIndex].value;
 		const newsDivision = selDivision.options[selDivision.selectedIndex].value;
@@ -165,16 +166,12 @@
 		const dest = `news/${newsName}?newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
 
 		connect("GET", dest, function(readyState, status, response) {
-				view.disabled = false;
 				if (readyState != 4 || status != 200) return;
 				list(null, 1);
 			});
 	}
 
 	function list(view, page) { //페이지의 뉴스 목록을 가져온다.
-		if (view != null)
-			view.disabled = true;
-
 		/* Get news count */
 		let count, size;
 		let dest = `news/count`;
@@ -182,6 +179,14 @@
 			if (readyState != 4 || status != 200) return;
 			count = response;
 			size = 10;
+
+			const divNlist = document.getElementById("n_list");
+			divNlist.innerText = `총 ${count} 개`;
+
+			const spanGoLastPage = document.getElementById("go_last_page");
+			spanGoLastPage.onclick = function(e) {
+				list(null, Math.ceil(count / size));
+			};
 
 			const btnGroup = document.getElementById("page");
 			while (btnGroup.firstChild)
@@ -198,9 +203,10 @@
 
 				/* Set btn */
 				btn.innerText = i;
+				btn.style.width = '50px';
 				btn.style.margin = '3px 3px 3px 3px';
 				btn.onclick = function(e) {
-					list(view, i);
+					list(null, i);
 				};
 				btn.className = (i==page)? 'btn btn-primary' : 'btn btn-outline-primary';
 
@@ -279,9 +285,6 @@
 						tr.appendChild(tdTxt);
 						table.appendChild(tr);
 					}
-
-					if (view != null)
-						view.disabled = false;
 				});
 			});
 	}
