@@ -33,7 +33,7 @@ function getNewsList(page, size, reqCallback) {
     /* Callback */
     const dbConnectCallback = function (connection) {
         const start = size * (page - 1);
-        var sql = `SELECT id, url, newspaper, category, division, date, title FROM ${database.TABLE_NAME} ORDER BY date DESC LIMIT ${start}, ${size}`;
+        var sql = `SELECT id, url, newspaper, category, division, date, title, text FROM ${database.TABLE_NAME} ORDER BY date DESC LIMIT ${start}, ${size}`;
         database.query(connection, sql, null, dbQueryCallback);
     }
 

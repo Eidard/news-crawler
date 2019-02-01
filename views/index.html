@@ -216,7 +216,7 @@
 					let rows = JSON.parse(response);
 
 					const table = document.getElementById("list");
-					//id  url  newspaper  category  division  date  title
+					//id  url  newspaper  category  division  date  title text
 					while (table.childElementCount > 1)
 						table.removeChild(table.lastChild);
 
@@ -243,7 +243,9 @@
 						tdCat.innerText = row.category;
 						tdDiv.innerText = row.division;
 						tdDat.innerText = row.date;
-						aTxtUrl.href = `https://s3.ap-northeast-2.amazonaws.com/cloud.ils.hansung.ac.kr/newsText/${row.newspaper}/${row.category}/${row.division}/${row.date}-${row.title}.txt`;
+						aTxtUrl.href = `http://${location.host}/resources/newsText/${row.text}`;
+						aTxtUrl.download = `${row.date}-${row.title}.txt`;
+//`https://s3.ap-northeast-2.amazonaws.com/cloud.ils.hansung.ac.kr/newsText/${row.newspaper}/${row.category}/${row.division}/${row.date}-${row.title}.txt`;
 						iTxtIcon.className = 'far fa-file-alt';
 						iTxtIcon.style = 'font-size:24px';
 

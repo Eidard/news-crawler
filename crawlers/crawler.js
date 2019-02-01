@@ -3,10 +3,10 @@ const { mergeAll } = require('rxjs/operators'); //콜백관리
 const request = require('request'); //http request
 
 const Database = require('./../services/database');
-const S3 = require('./../services/file-manager');
+const FileManager = require('./../services/file-manager');
 
 const database = new Database();
-const s3 = new S3();
+const fileManager = new FileManager();
 
 
 /**
@@ -87,11 +87,11 @@ class Crawler {
             let obsList = [];
 
             for (let i = 0; i < rows.length; i++) {
-                let newsTitle = rows[i][0].replace(/\//g, '\|').replace(/\+/g, ' (plus) ').replace(/\%/g, ' percent ').trim();
+                let newsTitle = rows[i][0].replace(/\//g, '\|').replace(/\%/g, ' percent ').trim();//.replace(/\+/g, ' (plus) ').replace(/\%/g, ' percent ').trim();
                 let newsUrl = rows[i][1];
                 let newsDate = rows[i][2];
 
-                console.log(`${page}page ... ${newsDate} in ${crawler.startDate} ~ ${crawler.endDate}`);
+                console.log(`${page} page ... ${newsDate} in ${crawler.startDate} ~ ${crawler.endDate}`);
                 if (newsDate >= crawler.startDate) { //크롤링 계속
                     if (newsDate <= crawler.endDate) {
                         let obs$ = Observable.create(function(reqObs) {
@@ -103,14 +103,14 @@ class Crawler {
                                     return;
                                 }
                                 let filepath;
-                                if (crawler.newsDivision != undefined) {
+                                if (crawler.newsDivision != '-') {
                                     filepath = `${crawler.newspaper}/${crawler.newsCategory}/${crawler.newsDivision}`;
                                 } else {
                                     filepath = `${crawler.newspaper}/${crawler.newsCategory}`;
                                 }
                                 let filename = `${newsDate}-${newsTitle}.txt`;
                                 let newsText = crawler.parseNewsText(body);
-                                s3.putText(filepath, filename, newsText, fileurl => {
+                                fileManager.putText(filepath, filename, newsText, () => {
                                     let news = [newsUrl, crawler.newspaper, crawler.newsCategory, crawler.newsDivision, newsDate, newsTitle, `${filepath}/${filename}`];
                                     reqObs.next(news);
                                     reqObs.complete();
