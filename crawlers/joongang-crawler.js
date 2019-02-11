@@ -87,7 +87,7 @@ class JoongangCrawler extends Crawler {
         let $ = cheerio.load(body);
 	let $text = $('div#articlebody');
         $text.find('br').replaceWith('\n');
-        return $text.text().replace(/\n\n+/gi, '\r\n').trim();
+	return $text.text().replace(/\n\n+/gi, '\r\n').trim();
     }
 
     formatDate(date) {

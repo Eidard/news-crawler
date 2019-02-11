@@ -43,7 +43,7 @@ class ReutersCrawler extends Crawler {
         for (let i = 0; i < n; i++) {
             text += pTags.eq(i).text().trim() + "\r\n";
         }
-        return text;
+        return text.trim();
     }
 
     formatDate(date) {

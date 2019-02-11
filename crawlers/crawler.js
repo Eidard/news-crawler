@@ -109,7 +109,7 @@ class Crawler {
                                     filepath = `${crawler.newspaper}/${crawler.newsCategory}`;
                                 }
                                 let filename = `${newsDate}-${newsTitle}.txt`;
-                                let newsText = crawler.parseNewsText(body);
+                                let newsText = crawler.makeLinesEndsWithClose(crawler.parseNewsText(body));
                                 fileManager.putText(filepath, filename, newsText, () => {
                                     let news = [newsUrl, crawler.newspaper, crawler.newsCategory, crawler.newsDivision, newsDate, newsTitle, `${filepath}/${filename}`];
                                     reqObs.next(news);
@@ -142,6 +142,23 @@ class Crawler {
                 }
             });
         }); //request
+    }
+
+    makeLinesEndsWithClose(text) {
+        let toks = text.split(/ +/g);
+        if (toks.length == 0)
+            return text;
+
+        let textLines = '';
+        let i;
+        for (i = 0; i < toks.length - 1; i++) {
+            let cur = toks[i].trim();
+            if (cur.match(/.*[.?!][\)"'“]*$/) && toks[i+1].trim().match(/^[\("'“]*[A-Z].*/))
+                textLines += (cur + '\r\n');
+            else
+                textLines += (cur + ' ');
+        }
+        return textLines + toks[i].trim();
     }
 
     getNewsBoardUrl(newsCategory, newsDivision, page) { console.log('abstract getNewsBoardUrl'); }
