@@ -33,7 +33,7 @@ function getNewsList(page, size, reqCallback) {
     /* Callback */
     const dbConnectCallback = function (connection) {
         const start = size * (page - 1);
-        var sql = `SELECT id, url, newspaper, category, division, date, title, text FROM ${database.TABLE_NAME} ORDER BY date DESC LIMIT ${start}, ${size}`;
+        var sql = `SELECT * FROM ${database.TABLE_NAME} ORDER BY date DESC LIMIT ${start}, ${size}`;
         database.query(connection, sql, null, dbQueryCallback);
     }
 
@@ -49,26 +49,27 @@ function getNewsList(page, size, reqCallback) {
     database.connect(dbConnectCallback);
 }
 
-function getNewsText(id, reqCallback) {
-    /* Callback */
-    const dbConnectCallback = function (connection) {
-        var sql = `SELECT text FROM ${database.TABLE_NAME} WHERE id=${id}`;
-        database.query(connection, sql, null, dbQueryCallback);
-    }
+// s3 에서 직접 불러오는 것으로 변경
+//function getNewsText(id, reqCallback) {
+//    /* Callback */
+//    const dbConnectCallback = function (connection) {
+//        var sql = `SELECT text FROM ${database.TABLE_NAME} WHERE id=${id}`;
+//        database.query(connection, sql, null, dbQueryCallback);
+//    }
 
-    const dbQueryCallback = function (connection, rows) {
-        database.disconnect(connection, function () { });
-        if (rows.length > 0) {
-            let filename = rows[0].text;
-            fileManager.getText(filename, text => reqCallback(0, text));
-        } else {
-            reqCallback(1, null);
-        }
-    }
+//    const dbQueryCallback = function (connection, rows) {
+//        database.disconnect(connection, function () { });
+//        if (rows.length > 0) {
+//            let filename = rows[0].text;
+//            fileManager.getText(filename, text => reqCallback(0, text));
+//        } else {
+//            reqCallback(1, null);
+//        }
+//    }
 
     /* execute */
-    database.connect(dbConnectCallback);
-}
+//    database.connect(dbConnectCallback);
+//}
 
 
 /* Router */
@@ -127,16 +128,17 @@ module.exports = function (app) {
         });
     });
 
-    app.get('/news/content', function (req, res) {
-        console.log(req.route.path);
-        id = req.query.id;
-        getNewsText(id, function (err, text) {
-            if (err) {
-                res.status(203).end();
-                return;
-            }
-            res.status(200).send(text).end();
-        });
-    });
+// 클라이언트 측에서 s3에서 텍스트 내용을 직접 불러오는 것으로 변경
+//    app.get('/news/content', function (req, res) {
+//        console.log(req.route.path);
+//        id = req.query.id;
+//        getNewsText(id, function (err, text) {
+//            if (err) {
+//                res.status(203).end();
+//                return;
+//            }
+//            res.status(200).send(text).end();
+//        });
+//    });
 
 }

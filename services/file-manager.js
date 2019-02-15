@@ -1,5 +1,5 @@
 /* AWS S3 */
-//const AWS = require('aws-sdk');
+const AWS = require('aws-sdk');
 const formidable = require('formidable');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
@@ -7,14 +7,14 @@ const mkdirp = require('mkdirp');
 class FileManager {
 
     constructor() {
-//        AWS.config.region = 'ap-northeast-2';
-//        this.s3 = new AWS.S3();
-//        this.params = {
-//            Bucket: 'cloud.ils.hansung.ac.kr',
-//            Key: null,
-//            ACL: 'public-read',
-//            Body: null
-//        };
+        AWS.config.region = 'ap-northeast-2';
+        this.s3 = new AWS.S3();
+        this.params = {
+            Bucket: 'cloud.ils.hansung.ac.kr',
+            Key: null,
+            ACL: 'public-read',
+            Body: null
+        };
         this.form = new formidable.IncomingForm({
             encoding: 'utf-8',
             multiples: true,
@@ -25,14 +25,15 @@ class FileManager {
 
     putText(filepath, filename, text, callback) {
         this.textToTextfile(filepath, filename, text, path => {
-            callback();
-     
+            let fullpath = `newsText/${filepath}/${filename}`;
+
             // S3 저장
-//            this.params.Key = `newsText/${filepath}/${filename}`;
-//            this.params.Body = fs.createReadStream(path);
-//            this.s3.upload(this.params, (err, result) => {
-//                //callback(result.Location);
-//            });
+            this.params.Key = fullpath;
+            this.params.Body = fs.createReadStream(path);
+            this.s3.upload(this.params, (err, data) => {
+                fs.unlink(`${this.repopath}/${filepath}/${filename}`, (err) => {});
+                callback(data.Location);
+            });
         });
     }
 
@@ -56,6 +57,7 @@ class FileManager {
         });
     }
 
+    // deprecated : s3에서 직접 불러오는 것으로 변경
     textFileToText(filename, callback) {
         const path = `${this.repopath}/${filename}`;
         fs.readFile(path, 'utf-8', (err, data) => {

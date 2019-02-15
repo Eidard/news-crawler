@@ -15,7 +15,7 @@ class Database {
         });
 
         this.TABLE_NAME = "news";
-        this.INSERT_SQL = `INSERT IGNORE INTO ${this.TABLE_NAME} (url, newspaper, category, division, date, title, text) VALUES ?`;
+        this.INSERT_SQL = `INSERT IGNORE INTO ${this.TABLE_NAME} (url, newspaper, category, division, date, title, texturl, textsize, textwc, textsc) VALUES ?`;
     }
 
     connect(callback) {

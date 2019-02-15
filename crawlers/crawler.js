@@ -1,6 +1,7 @@
 const { Observable, from } = require('rxjs'); //콜백관리
 const { mergeAll } = require('rxjs/operators'); //콜백관리
 const request = require('request'); //http request
+const Buffer = require('buffer/').Buffer; //file byte size
 
 const Database = require('./../services/database');
 const FileManager = require('./../services/file-manager');
@@ -110,8 +111,11 @@ class Crawler {
                                 }
                                 let filename = `${newsDate}-${newsTitle}.txt`;
                                 let newsText = crawler.makeLinesEndsWithClose(crawler.parseNewsText(body));
-                                fileManager.putText(filepath, filename, newsText, () => {
-                                    let news = [newsUrl, crawler.newspaper, crawler.newsCategory, crawler.newsDivision, newsDate, newsTitle, `${filepath}/${filename}`];
+                                let textsize = Buffer.from(newsText).length;
+                                let textwc = newsText.match(/\w+/g).length;
+                                let textsc = newsText.match(/^.\w*/gm).length;
+                                fileManager.putText(filepath, filename, newsText, (texturl) => {
+                                    let news = [newsUrl, crawler.newspaper, crawler.newsCategory, crawler.newsDivision, newsDate, newsTitle, texturl, textsize, textwc, textsc];
                                     reqObs.next(news);
                                     reqObs.complete();
                                 });

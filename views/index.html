@@ -51,7 +51,7 @@
 	<div id="n_list"></div>
 	<table class="table table-bordered" id="list">
 		<tr>
-			<th>id</th><th>제목</th><th>신문사</th><th>상위 분류</th><th>하위 분류</th><th>날짜</th><th>TXT</th>
+			<th>id</th><th>제목</th><th>신문사</th><th>상위 분류</th><th>하위 분류</th><th>날짜</th><th>파일크기</th><th>단어수</th><th>문장수</th><th>TXT</th>
 		</tr>
 	</table>
 	<span class="link" onclick="list(null, 1)">처음으로</span>
@@ -236,6 +236,9 @@
 						let tdCat = document.createElement("TD");
 						let tdDiv = document.createElement("TD");
 						let tdDat = document.createElement("TD");
+                                                let tdSize = document.createElement("TD");
+                                                let tdWc = document.createElement("TD");
+                                                let tdSc = document.createElement("TD");
 						let tdTxt = document.createElement("TD");
 						let aTxtUrl = document.createElement("A");
 						let iTxtIcon = document.createElement("I");
@@ -249,15 +252,17 @@
 						tdCat.innerText = row.category;
 						tdDiv.innerText = row.division;
 						tdDat.innerText = row.date;
-						aTxtUrl.href = `http://${location.host}/resources/newsText/${row.text}`;
+						tdSize.innerText = row.textsize;
+						tdWc.innerText = row.textwc;
+						tdSc.innerText = row.textsc;
+						aTxtUrl.href = row.texturl;
 						aTxtUrl.download = `${row.date}-${row.title}.txt`;
-//`https://s3.ap-northeast-2.amazonaws.com/cloud.ils.hansung.ac.kr/newsText/${row.newspaper}/${row.category}/${row.division}/${row.date}-${row.title}.txt`;
 						iTxtIcon.className = 'far fa-file-alt';
 						iTxtIcon.style = 'font-size:24px';
 
-						tr.onclick = function(e) {
-								loadContent(row.id, row.title);
-							};
+//						tr.onclick = function(e) {
+//								loadContent(row.title, row.text);
+//							};
 						
 						tr.onmouseover = function(e) {
 								tr.style.backgroundColor = 'DodgerBlue';
@@ -280,6 +285,9 @@
 						tr.appendChild(tdCat);
 						tr.appendChild(tdDiv);
 						tr.appendChild(tdDat);
+						tr.appendChild(tdSize);
+						tr.appendChild(tdWc);
+						tr.appendChild(tdSc);
 						aTxtUrl.appendChild(iTxtIcon);
 						tdTxt.appendChild(aTxtUrl);
 						tr.appendChild(tdTxt);
@@ -289,27 +297,26 @@
 			});
 	}
 
-	function loadContent(id, title) { //뉴스 내용을 가져온다.
-		/* Get news text */
-		let dest = `news/content?id=${id}`;
-		connect("GET", dest, function(readyState, status, response) {
-				if (readyState != 4 || status != 200) return;
-
-				let text = response;
-
-				/* Bind */
-				const divTitle = document.getElementById("title");
-				while (divTitle.firstChild)
-					divTitle.removeChild(divTitle.firstChild);
-				const divContent = document.getElementById("content");
-				while (divContent.firstChild)
-					divContent.removeChild(divContent.firstChild);
-
-				/* Set text */
-				divTitle.innerText = title;
-				divContent.innerText = text;
-			});
-	}
+//	function loadContent(title, texturl) { //뉴스 내용을 가져온다.
+//		/* Get news text */
+//		connect("GET", texturl, function(readyState, status, response) {
+//				if (readyState != 4 || status != 200) return;
+//
+//				let text = response;
+//
+//				/* Bind */
+//				const divTitle = document.getElementById("title");
+//				while (divTitle.firstChild)
+//					divTitle.removeChild(divTitle.firstChild);
+//				const divContent = document.getElementById("content");
+//				while (divContent.firstChild)
+//					divContent.removeChild(divContent.firstChild);
+//
+//				/* Set text */
+//				divTitle.innerText = title;
+//				divContent.innerText = text;
+//			});
+//	}
 
 </script>
 
