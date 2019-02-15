@@ -24,14 +24,12 @@ class FileManager {
     }
 
     putText(filepath, filename, text, callback) {
-        this.textToTextfile(filepath, filename, text, path => {
-            let fullpath = `newsText/${filepath}/${filename}`;
-
+        this.textToTextfile(filename, text, savedpath => {
             // S3 저장
-            this.params.Key = fullpath;
-            this.params.Body = fs.createReadStream(path);
+            this.params.Key = `/${filepath}/${filename}`;
+            this.params.Body = fs.createReadStream(savedpath);
             this.s3.upload(this.params, (err, data) => {
-                fs.unlink(`${this.repopath}/${filepath}/${filename}`, (err) => {});
+                fs.unlink(savedpath, (err) => {});
                 callback(data.Location);
             });
         });
@@ -43,15 +41,15 @@ class FileManager {
         });
     }
 
-    textToTextfile(filepath, filename, text, callback) {
-        const path = `${this.repopath}/${filepath}`;
-        mkdirp(path, err => {
-            fs.writeFile(`${path}/${filename}`, text, 'utf-8', err => {
+    textToTextfile(filename, text, callback) {
+        const path = `${this.repopath}/${filename}`;
+        mkdirp(`${this.repopath}`, (err) => {
+            fs.writeFile(path, text, 'utf-8', (err) => {
                 if (err) {
                     console.log(err);
                     callback(null);
                 } else {
-                    callback(`${path}/${filename}`);
+                    callback(path);
                 }
             });
         });
