@@ -23,18 +23,19 @@ class FileManager {
         this.repopath = './public/resources/newsText';
     }
 
-    putText(filepath, filename, text, callback) {
-        this.textToTextfile(filename, text, savedpath => {
+    putText(dirname, filename, text, callback) {
+        this.textToTextfile(filename, text, localFilePath => {
             // S3 저장
-            this.params.Key = `/${filepath}/${filename}`;
-            this.params.Body = fs.createReadStream(savedpath);
+            this.params.Key = `${dirname}/${filename}`;
+            this.params.Body = fs.createReadStream(localFilePath);
             this.s3.upload(this.params, (err, data) => {
-                fs.unlink(savedpath, (err) => {});
+                fs.unlink(localFilePath, (err) => {});
                 callback(data.Location);
             });
         });
     }
 
+    // not use
     getText(filename, callback) {
         this.textFileToText(filename, data => {
             callback(data);
@@ -42,11 +43,11 @@ class FileManager {
     }
 
     textToTextfile(filename, text, callback) {
-        const path = `${this.repopath}/${filename}`;
         mkdirp(`${this.repopath}`, (err) => {
-            fs.writeFile(path, text, 'utf-8', (err) => {
-                if (err) {
-                    console.log(err);
+	    const path = `${this.repopath}/${filename}`;
+            fs.writeFile(path, text, 'utf-8', (err1) => {
+                if (err1) {
+                    console.log(err1);
                     callback(null);
                 } else {
                     callback(path);
@@ -55,7 +56,7 @@ class FileManager {
         });
     }
 
-    // deprecated : s3에서 직접 불러오는 것으로 변경
+    // not use
     textFileToText(filename, callback) {
         const path = `${this.repopath}/${filename}`;
         fs.readFile(path, 'utf-8', (err, data) => {

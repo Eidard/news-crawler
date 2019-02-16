@@ -17,11 +17,11 @@
 
 <body>
 
-<div class="container-fluid text-center" style="padding: 20px 20px 20px 20px">
-	<a href='/' style="color: black; text-decoration: none"><h2>영어 신문 기사 수집 도구</h2></a>
-</div>
+<header>
+        <% include ./header.ejs %>
+</header>
 
-<div class="jumbotron" style="padding: 20px 60px 20px 60px">
+<div class="jumbotron" style="padding: 20px 60px 20px 60px; margin: 5px 0px">
 	<label for="newsName"><h5>신문 / 분야</h5></label>
 	<div class="form-inline">
 		<select class="form-control mr-sm-2" id="newsName" onchange="changeNewsCategory()">
@@ -42,11 +42,6 @@
 	</div>
 </div>
 
-<h4><div class="container-fluid" id="title" style="padding: 0px 20px 10px 20px"></div></h4>
-<div class="container-fluid" id="content" style="font-size: 16.5px; letter-spacing: 1.8; word-spacing: 1.8; line-height: 1.8; padding: 10px 20px 0px 20px"></div>
-
-<br>
-
 <div class="container-fluid">
 	<div id="n_list"></div>
 	<table class="table table-bordered" id="list">
@@ -59,9 +54,16 @@
 	<div class="text-center" id="page" style="padding: 0px 20px 20px 20px"></div>
 </div>
 
+<br>
+
+<h4><div class="container-fluid" id="title" style="padding: 0px 20px 10px 20px"></div></h4>
+<div class="container-fluid" id="content" style="font-size: 16.5px; letter-spacing: 1.8; word-spacing: 1.8; line-height: 1.8; padding: 10px 20px 20px 20px"></div>
+
 <footer class="container-fluid text-center" style="background-color: #f2f2f2; padding: 25px">
 	<p>SDKIM-ORG Copyright</p>
 </footer>
+
+<button type="button" class="btn btn-outline-dark float-right" id="btnScrollTop" style="display: none; position: fixed; bottom: 20px; right: 20px" onclick="scrollPageTop()">Top</button>
 
 <!-- script -->
 <script type="text/javascript">
@@ -96,10 +98,17 @@
 	const selDivision = document.getElementById('newsDivision');
 
 	/* execute */
+	document.getElementById("nav-newscrawling").classList.add('active');
 	selNewsName.selectedIndex = 0;
 	changeNewsCategory();
 	list(null, 1);
-
+	window.onscroll = () => {
+		if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+			document.getElementById("btnScrollTop").style.display = "block";
+		} else {
+			document.getElementById("btnScrollTop").style.display = "none";
+		}
+	}
 
 	/* View Control */
 	function changeNewsCategory() {
@@ -140,10 +149,14 @@
 		}
 	}
 
+	function scrollPageTop() {
+		document.body.scrollTop = 0;
+		document.documentElement.scrollTop = 0;
+	}
 
 	/* Http Server */
-	function connect(type, dest, callback) { //ajax http 연결
-		var xmlhttp;
+	function connect(type, dest, header, callback) { //ajax http 연결
+		let xmlhttp;
 		if (window.XMLHttpRequest)
 			xmlhttp = new XMLHttpRequest(); // code for modern browsers
 		else
@@ -154,6 +167,9 @@
 		};
 
 		xmlhttp.open(type, dest, true); //open url
+		for (let i = 0; header != null && i < header.length; i++) {
+			xmlhttp.setRequestHeader(header[i]['name'], header[i]['value']);
+		}
 		xmlhttp.send();
 	}
 
@@ -165,7 +181,7 @@
 		const endDate = document.getElementById("endDate").value;
 		const dest = `news/${newsName}?newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
 
-		connect("GET", dest, function(readyState, status, response) {
+		connect("GET", dest, null, function(readyState, status, response) {
 				if (readyState != 4 || status != 200) return;
 				list(null, 1);
 			});
@@ -175,7 +191,7 @@
 		/* Get news count */
 		let count, size;
 		let dest = `news/count`;
-		connect("GET", dest, function(readyState, status, response) {
+		connect("GET", dest, null, function(readyState, status, response) {
 			if (readyState != 4 || status != 200) return;
 			count = response;
 			size = 10;
@@ -216,7 +232,7 @@
 
 			/* Get news list */
 			dest = `news/list?page=${page}&size=${size}`;
-			connect("GET", dest, function(readyState, status, response) {
+			connect("GET", dest, null, function(readyState, status, response) {
 					if (readyState != 4 || status != 200) return;
 
 					let rows = JSON.parse(response);
@@ -260,9 +276,9 @@
 						iTxtIcon.className = 'far fa-file-alt';
 						iTxtIcon.style = 'font-size:24px';
 
-//						tr.onclick = function(e) {
-//								loadContent(row.title, row.text);
-//							};
+						tr.onclick = function(e) {
+								loadContent(row.title, row.texturl);
+							};
 						
 						tr.onmouseover = function(e) {
 								tr.style.backgroundColor = 'DodgerBlue';
@@ -297,26 +313,26 @@
 			});
 	}
 
-//	function loadContent(title, texturl) { //뉴스 내용을 가져온다.
-//		/* Get news text */
-//		connect("GET", texturl, function(readyState, status, response) {
-//				if (readyState != 4 || status != 200) return;
-//
-//				let text = response;
-//
-//				/* Bind */
-//				const divTitle = document.getElementById("title");
-//				while (divTitle.firstChild)
-//					divTitle.removeChild(divTitle.firstChild);
-//				const divContent = document.getElementById("content");
-//				while (divContent.firstChild)
-//					divContent.removeChild(divContent.firstChild);
-//
-//				/* Set text */
-//				divTitle.innerText = title;
-//				divContent.innerText = text;
-//			});
-//	}
+	function loadContent(title, texturl) { //뉴스 내용을 가져온다.
+		/* Get news text */
+		connect("GET", texturl, null, function(readyState, status, response) {
+				if (readyState != 4 || status != 200) return;
+
+				let text = response;
+
+				/* Bind */
+				const divTitle = document.getElementById("title");
+				while (divTitle.firstChild)
+					divTitle.removeChild(divTitle.firstChild);
+				const divContent = document.getElementById("content");
+				while (divContent.firstChild)
+					divContent.removeChild(divContent.firstChild);
+
+				/* Set text */
+				divTitle.innerText = title;
+				divContent.innerText = text;
+			});
+	}
 
 </script>
 

@@ -17,9 +17,9 @@
 
 <body>
 
-<div class="container-fluid text-center" style="padding: 20px 20px 20px 20px">
-	<a href='/' style="color: black; text-decoration: none"><h2>영어 신문 기사 수집 도구</h2></a>
-</div>
+<header>
+        <% include ./header.ejs %>
+</header>
 
 <div class="jumbotron" style="padding: 20px 60px 20px 60px">
 	<label for="newsName"><h5>신문 / 분야</h5></label>
@@ -96,6 +96,7 @@
 	const selDivision = document.getElementById('newsDivision');
 
 	/* execute */
+	document.getElementById("nav-corpus").classList.add('active');
 	selNewsName.selectedIndex = 0;
 	changeNewsCategory();
 	list(null, 1);

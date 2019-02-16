@@ -103,18 +103,18 @@ class Crawler {
                                     reqObs.complete();
                                     return;
                                 }
-                                let filepath;
+                                let dirname;
                                 if (crawler.newsDivision != '-') {
-                                    filepath = `${crawler.newspaper}/${crawler.newsCategory}/${crawler.newsDivision}`;
+                                    dirname = `${crawler.newspaper}/${crawler.newsCategory}/${crawler.newsDivision}`;
                                 } else {
-                                    filepath = `${crawler.newspaper}/${crawler.newsCategory}`;
+                                    dirname = `${crawler.newspaper}/${crawler.newsCategory}`;
                                 }
                                 let filename = `${newsDate}-${newsTitle}.txt`;
                                 let newsText = crawler.makeLinesEndsWithClose(crawler.parseNewsText(body));
                                 let textsize = Buffer.from(newsText).length;
                                 let textwc = newsText.match(/\w+/g).length;
                                 let textsc = newsText.match(/^.\w*/gm).length;
-                                fileManager.putText(filepath, filename, newsText, (texturl) => {
+                                fileManager.putText(dirname, filename, newsText, (texturl) => {
                                     let news = [newsUrl, crawler.newspaper, crawler.newsCategory, crawler.newsDivision, newsDate, newsTitle, texturl, textsize, textwc, textsc];
                                     reqObs.next(news);
                                     reqObs.complete();
