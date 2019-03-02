@@ -1,0 +1,111 @@
+<div class="jumbotron" style="padding: 20px 60px 20px 60px; margin: 5px 0px">
+	<label for="newsName"><h5>뉴스 / 분야</h5></label>
+	<div class="form-inline">
+		<select class="form-control mr-sm-2" id="newsName" onchange="changeNewsCategory()">
+            <option value="">----- 뉴스 선택 -----</option>
+			<option value="joongang">데일리 중앙</option>
+			<option value="herald">코리아헤럴드</option>
+			<!--<option value="mk">매일경제</option>-->
+			<option value="reuters">로이터</option>
+		</select>
+		<select class="form-control mr-sm-2" id="newsCategory" onchange="changeNewsDivision()">
+            <option value="">----- 상위 분류 -----</option>
+        </select>
+		<select class="form-control mr-sm-2" id="newsDivision">
+            <option value="">----- 하위 분류 -----</option>
+        </select>
+	</div>
+	<br>
+	<label for="startDate"><h5>기간</h5></label>
+    <button type="button" class="btn" onclick="initDate()"><i class="fas fa-eraser"></i></button>
+    <div class="form-inline">
+        <input class="form-control mr-sm-2" id="startDate" type="date" value="">
+        <input class="form-control mr-sm-2" id="endDate" type="date" value="">
+    </div>
+</div>
+
+
+<script type="text/javascript">
+	const inputform_selNewsName = document.getElementById('newsName');
+	const inputform_selCategory = document.getElementById('newsCategory');
+    const inputform_selDivision = document.getElementById('newsDivision');
+    const inputform_startDate = document.getElementById("startDate");
+    const inputform_endDate = document.getElementById("endDate");
+
+    // TODO : complete categories and divisions
+	const divisions = { //하위 분류
+        '': {},
+		'herald': {
+			'National': ['Politics', 'Social Affairs', 'Foreign Affairs', 'Defense', 'North Korea', 'Science', 'Diplomatic Circuit', 'Education'],
+			'Business': ['Economy', 'Finance', 'Industry', 'Technology', 'Automode'],
+			'Life&Style': ['Culture', 'Travel', 'Fashion', 'Food&Beverage', 'Books', 'People', 'Expat Living', 'Arts&Design', 'Health'],
+			'Entertainment': ['Film', 'Television', 'Music', 'Theater'],
+			'Sports': ['Soccer', 'Baseball', 'Golf', 'More Sports'],
+			'World': ['World News', 'World Business', 'Asia News Network']
+		},
+		'joongang': {
+			'National': ['Politics', 'Social affairs', 'Education', 'People', 'Special Series'],
+			'Business': ['Economy', 'Finance', 'Industry', 'Stock Market', 'Special Series', 'Sponsored Report'],
+			'Opinion': ['Editorials', 'Columns', 'Fountain', 'Cartoons', 'Letters'],
+			'Curlture': ['Features', 'Arts', 'Entertainment', 'Style & Travel', 'Movie', 'Korean Heritage', 'Ticket', 'Music & Performance'],
+			'Sports': ['Domestic', 'International', 'Special Series'],
+			'Foreign community': ['Activities', 'Special Series']
+		},
+		'mk': {'Biz&Company': [], 'Tech': [], 'Market': [], 'Economy': [], 'Seoul': [], 'Asia': [], 'Analysis': []},
+		'reuters': {'Banks': [], 'Business News': [], 'Politics': [], 'Supreme Court': [], 'U.S': []}
+    };
+    const categories = { //상위 분류
+        '': [],
+        'herald': Object.keys(divisions['herald']),
+        'joongang': Object.keys(divisions['joongang']),
+        'mk': Object.keys(divisions['mk']),
+        'reuters': Object.keys(divisions['reuters'])
+    }
+
+    inputform_selNewsName.selectedIndex = 0;
+    changeNewsCategory();
+
+
+	/* View Control */
+	function changeNewsCategory() {
+		// clear
+		while (inputform_selCategory.options.length > 1)
+			inputform_selCategory.remove(1);
+
+		// add options
+        const newsName = inputform_selNewsName.options[inputform_selNewsName.selectedIndex].value;
+		categories[newsName].forEach(category => {
+			let option = new Option(category, category);
+			inputform_selCategory.options.add(option);
+		});
+
+		// set default
+        inputform_selCategory.selectedIndex = 0;
+        changeNewsDivision();
+	}
+
+	function changeNewsDivision() {
+		// clear
+		while (inputform_selDivision.options.length > 1)
+			inputform_selDivision.remove(1);
+
+		// add options
+		const newsName = inputform_selNewsName.options[inputform_selNewsName.selectedIndex].value;
+        const newsCategory = inputform_selCategory.options[inputform_selCategory.selectedIndex].value;
+        if (newsCategory != "") {
+            divisions[newsName][newsCategory].forEach(division => {
+                let option = new Option(division, division);
+                inputform_selDivision.options.add(option);
+            });
+        }
+
+		// set default
+        inputform_selDivision.selectedIndex = 0;
+    }
+    
+    function initDate() {
+        inputform_startDate.value = "";
+        inputform_endDate.value = "";
+    }
+
+</script>

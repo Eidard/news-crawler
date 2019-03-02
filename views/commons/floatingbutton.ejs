@@ -1,0 +1,18 @@
+<button type="button" class="btn btn-outline-dark float-right" id="btnScrollTop" style="display: none; position: fixed; bottom: 20px; right: 20px" onclick="scrollPageTop()">Top</button>
+
+<script type="text/javascript">
+    window.onscroll = () => {
+		if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+			document.getElementById("btnScrollTop").style.display = "block";
+		} else {
+			document.getElementById("btnScrollTop").style.display = "none";
+		}
+	}
+
+	/* View Controll */
+	function scrollPageTop() {
+		document.body.scrollTop = 0;
+		document.documentElement.scrollTop = 0;
+	}
+
+</script>

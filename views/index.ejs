@@ -1,47 +1,33 @@
 <html>
-<head>
-	<meta charset="utf-8">
-	<title>English Corpus Construction</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css">
-
-	<!-- bootstrap4 -->
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
-
-	<!-- font awesome 5 -->
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-</head>
+<head><% include commons/head.ejs %></head>
 
 <body>
 
-<header>
-	<% include ./header.ejs %>
-</header>
+	<header><% include commons/header.ejs %></header>
 
-<div class="container-fluid text-center" style="padding: 50px 20px 20px 20px">
-	<a href='/' style="color: black; text-decoration: none"><h1>Web NLP Tools</h1></a>
-</div>
+	<div class="container-fluid text-center" style="padding: 50px 20px 20px 20px">
+		<a href='/' style="color: black; text-decoration: none"><h1>Web NLP Tools</h1></a>
+	</div>
 
-<div class="jumbotron" style="padding: 50px; margin: 180px 5px 300px 5px">
-	<button type="button" class="btn btn-primary btn-lg btn-block" onclick="go_page('/newscrawling')">뉴스 크롤링</button>
-	
-	<button type="button" class="btn btn-primary btn-lg btn-block" onclick="go_page('/corpus')">말뭉치 확인</button>
-</div>
+	<div class="jumbotron" style="padding: 50px; margin: 180px 5px 300px 5px">
+		<button type="button" class="btn btn-primary btn-lg btn-block" onclick="go_page('/newscrawling')">뉴스 크롤링</button>
+		
+		<button type="button" class="btn btn-primary btn-lg btn-block" onclick="go_page('/newscorpus')">말뭉치 확인</button>
+	</div>
 
-<footer class="container-fluid text-center" style="background-color: #f2f2f2; padding: 25px">
-	<p>SDKIM-ORG Copyright</p>
-</footer>
+	<footer><% include commons/footer.ejs %></footer>
 
-<!-- script -->
-<script type="text/javascript">
-	/* View Control */
-	function go_page(dest) {
-		location.href = dest;
-	}
-</script>
+	<!-- top button -->
+	<% include commons/floatingbutton.ejs %>
+
+
+	<!-- script -->
+	<script type="text/javascript">
+		/* View Control */
+		function go_page(dest) {
+			location.href = dest;
+		}
+	</script>
 
 </body>
 </html>

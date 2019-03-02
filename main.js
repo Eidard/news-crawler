@@ -4,7 +4,8 @@ var bodyParser = require('body-parser');
 
 // 라우팅 시작
 var main_router = require('./router/main') (app);
-var news_router = require('./router/news') (app);
+var newscrawling_router = require('./router/newscrawling') (app);
+var newscorpus_router = require('./router/newscorpus') (app);
 
 // 뷰 설정
 app.set('views', __dirname + '/views');

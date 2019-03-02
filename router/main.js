@@ -9,7 +9,7 @@ module.exports = function(app)
 		res.render('newscrawling.ejs');
 	});
 
-	app.get('/corpus', function(req, res) {
-		res.render('corpus.ejs');
+	app.get('/newscorpus', function(req, res) {
+		res.render('newscorpus.ejs');
 	});
 }
