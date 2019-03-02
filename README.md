@@ -2,8 +2,6 @@
 
 - node.js 설치
 
-- npm 설치
-
 - news/package.json 에 있는 dependency 설치
 > news.zip 압축 풀기<br>
 > $ cd news/<br>
@@ -13,19 +11,24 @@
 ## 배포
 
 - Set PORT
-> news/main.js 15번 줄에서 배포할 포트를 설정<br>
+> /main.js 19번 줄에서 배포할 포트를 설정<br>
+```javascript
+18  // 서버 실행
+19  var server = app.listen(50000, function() {
+20    console.log('server running ...');
+21  });
+```
 
 - Launch
 > $ npm start<br>
-
-- (Option) Launch as daemon
-> 백그라운드에서 실행할 경우 npm start를 nohup 명령어를 통해 실행한다.<br>
+※ Launch on background
 > $ sudo nohup npm start &<br>
 
 - Check
-> 브라우저에서 ip: 설정한 포트 입력하여 배포 확인<br>
 > localhost:50000<br>
 
 
 ## 웹페이지
-![웹페이지](https://postfiles.pstatic.net/MjAxOTAyMDFfODkg/MDAxNTQ4OTk5MDk5NDc2.986er7T690fgAGlO-QdLZ3WxK5o7Z2ycIgGpFwwRWJMg.rfc-SXXR3aupMQq5UWgzlWN3EaKBHUuew6fHzSPKyxEg.PNG.dragon20002/news-crawler.png?type=w580)
+![홈](https://postfiles.pstatic.net/MjAxOTAzMDNfMjE5/MDAxNTUxNTUxNzU5NDMw.pGKWoK33YAyQ84EBn48yzoiXxn8QOQEWzznkpGxAW8Mg.kJQ80ZdV4vFVtXORbnXRQ1ueX3sMHMR1UK_9TUcQV5Eg.PNG.dragon20002/SE-560ad40a-736b-4e52-9aea-abba832f75a5.png?type=w773)
+
+![corpus](https://postfiles.pstatic.net/MjAxOTAzMDNfMTYx/MDAxNTUxNTUxNzU4ODE3.wpRGmRuL0_tUWpxGvYWyJuiWrtPz-1oYJuKkDJEn1x0g.rL0Ci_UGkcYIEk6JareBj9TWOkk72QdDe_dhQWBfowgg.PNG.dragon20002/SE-1462d350-be55-44a6-aa64-a7e433b13e35.png?type=w773)
