@@ -20,31 +20,30 @@ class FileManager {
             multiples: true,
             keepExtensions: false
         });
-        this.repopath = './public/resources/newsText';
+        this.publicpath = './public';
+        this.txtpath = 'resources/newsText';
     }
 
-    putText(dirname, filename, text, callback) {
-        this.textToTextfile(filename, text, localFilePath => {
+    putText(dirpath, filename, text, callback) {
+        this.textToTextfile(dirpath, filename, text, localFilePath => {
             // S3 저장
-            this.params.Key = `${dirname}/${filename}`;
+            this.params.Key = `${dirpath}/${filename}`;
             this.params.Body = fs.createReadStream(localFilePath);
             this.s3.upload(this.params, (err, data) => {
                 fs.unlink(localFilePath, (err) => {});
-                callback(data.Location);
+                if (data != undefined)
+                    callback(data.Location);
+                else {
+                    console.log(err);
+                    callback(null);
+                }
             });
         });
     }
 
-    // not use
-    getText(filename, callback) {
-        this.textFileToText(filename, data => {
-            callback(data);
-        });
-    }
-
-    textToTextfile(filename, text, callback) {
-        mkdirp(`${this.repopath}`, (err) => {
-	    const path = `${this.repopath}/${filename}`;
+    textToTextfile(dirpath, filename, text, callback) {
+        mkdirp(`${this.publicpath}/${this.txtpath}/${dirpath}`, (err) => {
+            const path = `${this.publicpath}/${this.txtpath}/${dirpath}/${filename}`;
             fs.writeFile(path, text, 'utf-8', (err1) => {
                 if (err1) {
                     console.log(err1);
@@ -55,56 +54,6 @@ class FileManager {
             });
         });
     }
-
-    // not use
-    textFileToText(filename, callback) {
-        const path = `${this.repopath}/${filename}`;
-        fs.readFile(path, 'utf-8', (err, data) => {
-            if (err) {
-                callback(null);
-            } else {
-                callback(data);
-            }
-        });
-    }
 }
 
 module.exports = FileManager;
-
-
-/////////////////////////////////////DONWLOAD//////////////////////////////////
-// const fs = require('fs'); //file write
-
-
-// /**
-//  * DB에 저장된 크롤링 결과 Text를 txt 파일로 저장
-//  *
-//  * @param {*} startDate 시작일 ex) 20181021
-//  * @param {*} endDate 종료일 ex) 20181106
-//  * @param {*} newspaper 뉴스 종류 ex) 'joongang'
-//  * @param {*} categoryName 카테고리
-//  * @param {*} divisionName 분류
-//  */
-// function downloadNewsText(startDate, endDate, newspaper, categoryName, divisionName) {
-//     var route = "./resources/newsText/";
-
-//     var sql = `SELECT * FROM ${database.TABLE_NAME} WHERE newspaper='${newspaper}' AND category='${categoryName}'`
-//         + ` AND division='${divisionName}' AND date between '${startDate}' AND '${endDate}';`;
-
-//     database.query(sql)
-//         .then(rows => {
-//             num = 0;
-
-//             for (var i = 0; i < rows.length; i++) {
-//                 title = newspaper + "_" + categoryName + "_" + divisionName + "_" + rows[i].DATE + "_" + num++ + ".txt";
-//                 fs.writeFile(route + title, rows[i].NEWSTEXT, 'utf-8', function (e) {
-//                     if (e)
-//                         console.log(e);
-//                     else
-//                         console.log('01 WRITE DONE!');
-//                 });
-//             }
-
-//             return database.close();
-//         });
-// }

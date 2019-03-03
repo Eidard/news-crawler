@@ -65,7 +65,11 @@ class JoongangCrawler extends Crawler {
 
     getNewsBoardUrl(newsCategory, newsDivision, page) {
         let categoryId = this.categoryIds[newsCategory];
+        if (categoryId == undefined)
+            return null;
         let divisionId = this.divisionIds[newsCategory][newsDivision];
+        if (divisionId == undefined)
+            return null;
         return "http://koreajoongangdaily.joins.com/news/list/List.aspx?gCat=" + categoryId + divisionId + "&pgi=" + page;
     }
 

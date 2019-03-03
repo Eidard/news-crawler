@@ -1,21 +1,30 @@
 <script type="text/javascript">
 
 	/* Http Server */
-	function connect(type, dest, header, callback) { //ajax http 연결
+	function connect(type, dest, header, opt, callback) { //ajax http 연결
 		let xmlhttp;
 		if (window.XMLHttpRequest)
 			xmlhttp = new XMLHttpRequest(); // code for modern browsers
 		else
 			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP"); // code for old IE browsers
 
+		// request header
+		xmlhttp.open(type, dest, true); //open url
+		for (let i = 0; header != null && i < header.length; i++)
+			xmlhttp.setRequestHeader(header[i]['name'], header[i]['value']);
+
+		// xmlhttp options
+		if (opt != null) {
+			if (opt['timeout'] != undefined)
+				xmlhttp.timeout = opt['timeout'];
+		}
+
+		// xmlhttp event listener
 		xmlhttp.onreadystatechange = function() {
 			callback(xmlhttp.readyState, xmlhttp.status, xmlhttp.response);
 		};
 
-		xmlhttp.open(type, dest, true); //open url
-		for (let i = 0; header != null && i < header.length; i++) {
-			xmlhttp.setRequestHeader(header[i]['name'], header[i]['value']);
-		}
 		xmlhttp.send();
 	}
+
 </script>

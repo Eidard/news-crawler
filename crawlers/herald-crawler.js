@@ -67,7 +67,11 @@ class HeraldCrawler extends Crawler {
 
     getNewsBoardUrl(newsCategory, newsDivision, page) {
         let categoryId = this.categoryIds[newsCategory];
+        if (categoryId == undefined)
+            return null;
         let divisionId = this.divisionIds[newsCategory][newsDivision];
+        if (divisionId == undefined)
+            return null;
         return "http://www.koreaherald.com/list.php?ct=02" + categoryId + divisionId + "&ctv=0&np=" + page;
     }
 
@@ -96,8 +100,8 @@ class HeraldCrawler extends Crawler {
 
     parseNewsText(body) {
         let $ = cheerio.load(body);
-	let $text = $('div#articleText');
-	$text.find('br').replaceWith('\n');
+        let $text = $('div#articleText');
+        $text.find('br').replaceWith('\n');
         return $text.text().replace(/\n\n+/gi, '\r\n').trim();
     }
     

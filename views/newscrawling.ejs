@@ -8,7 +8,7 @@
 	<!-- input form -->
 	<% include news/inputform.ejs %>
 	<div class="container-fluid text-center">
-		<button type="button" class="btn btn-primary" onclick="list(null, 1)">크롤링 시작</button>
+		<button type="button" class="btn btn-primary" onclick="getNews(1)">크롤링 시작</button>
 	</div>
 
 	<!-- progress bar -->
@@ -45,7 +45,7 @@
 		document.getElementById("nav-newscrawling").classList.add('active');
 
 		/* Http Server */
-		function getNews(view) { //뉴스 업데이트 요청
+		function getNews() { //뉴스 업데이트 요청
 			const newsName = inputform_selNewsName.options[inputform_selNewsName.selectedIndex].value;
 			const newsCategory = inputform_selCategory.options[inputform_selCategory.selectedIndex].value;
 			const newsDivision = inputform_selDivision.options[inputform_selDivision.selectedIndex].value;
@@ -53,10 +53,12 @@
 			const endDate = document.getElementById("endDate").value;
 			const dest = `newscrawling/${newsName}?newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
 
-			connect("GET", dest, null, function(readyState, status, response) {
-					if (readyState != 4 || status != 200)
-						return;
-				});
+			connect("GET", dest, null, null, function(readyState, status, response) {
+				if (readyState != 4 || status != 200)
+					return;
+
+				// TODO notify crawling status
+			});
 		}
 
 	</script>

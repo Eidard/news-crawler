@@ -48,7 +48,7 @@ class Crawler {
                 // DB에 저장
                 complete: () => {
                     console.log(`total ${crawler.argList.length} added`);
-                    if (crawler.argList.length === 0) {
+                    if (crawler.argList.length == 0) {
                         reqCallback(1);
                         return;
                     }
@@ -75,12 +75,20 @@ class Crawler {
     crawling(page, crawlObs) {
         let crawler = this;
 
+        const handleCrawlingError = function() {
+            crawler.argList = [];
+            crawlObs.complete();
+        }
+
         let newsBoardUrl = this.getNewsBoardUrl(this.newsCategory, this.newsDivision, page);
+        if (newsBoardUrl == null) {
+            handleCrawlingError();
+            return;
+        }
 
         request(newsBoardUrl, function (err, res, body) {
             if (err) {
-                crawler.argList = [];
-                crawlObs.complete();
+                handleError();
                 return;
             }
 
@@ -96,15 +104,19 @@ class Crawler {
                 if (newsDate >= crawler.startDate) { //크롤링 계속
                     if (newsDate <= crawler.endDate) {
                         let obs$ = Observable.create(function(reqObs) {
+
+                            const handleReqError = function() {
+                                reqObs.complete();
+                            }
+
                             // 뉴스 본문 크롤링
                             request(newsUrl, function (err, res, body) {
                                 if (err) {
-                                    crawler.argList = [];
-                                    reqObs.complete();
+                                    handleReqError();
                                     return;
                                 }
                                 let dirname;
-                                if (crawler.newsDivision != '-') {
+                                if (crawler.newsDivision != '') {
                                     dirname = `${crawler.newspaper}/${crawler.newsCategory}/${crawler.newsDivision}`;
                                 } else {
                                     dirname = `${crawler.newspaper}/${crawler.newsCategory}`;
@@ -115,6 +127,10 @@ class Crawler {
                                 let textwc = newsText.match(/\w+/g).length;
                                 let textsc = newsText.match(/^.\w*/gm).length;
                                 fileManager.putText(dirname, filename, newsText, (texturl) => {
+                                    if (texturl == null) {
+                                        handleReqError();
+                                        return;
+                                    }
                                     let news = [newsUrl, crawler.newspaper, crawler.newsCategory, crawler.newsDivision, newsDate, newsTitle, texturl, textsize, textwc, textsc];
                                     reqObs.next(news);
                                     reqObs.complete();

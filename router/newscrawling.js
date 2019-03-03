@@ -22,16 +22,17 @@ module.exports = function (app) {
             startDate = req.query.startDate;
             endDate = req.query.endDate;
 
-            const reqCallback = function (err) {
-                res.status((err) ? 203 : 200).end();
-            };
+            // response immediately
+            res.status(200).end();
 
-            if (startDate.length == 0 || endDate.length == 0) {
-                reqCallback(1);
-                return;
-            }
-
-            newsCrawlers[newsNames[i]](newsCategory, newsDivision, startDate, endDate).updateCrawling(reqCallback);
+            newsCrawlers[newsNames[i]](newsCategory, newsDivision, startDate, endDate)
+                .updateCrawling(function(err) {
+                    if (err) {
+                        console.log('crawling stopped');
+                    } else {
+                        console.log('crawling done');
+                    }
+                });
         });
     }
 }

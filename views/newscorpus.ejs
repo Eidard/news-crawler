@@ -8,7 +8,8 @@
 	<!-- input form -->
 	<% include news/inputform.ejs %>
 	<div class="container-fluid text-center">
-		<button type="button" class="btn btn-primary" onclick="list(null, 1)">DB 검색</button>
+		<button type="button" class="btn btn-primary" onclick="list(1)"><i class="fas fa-search"></i>&nbsp;&nbsp;&nbsp;DB 검색</button>
+		<button type="button" class="btn btn-success" onclick="downloadContent()"><i class="fas fa-arrow-down"></i>&nbsp;&nbsp;&nbsp;내려받기</button>
 	</div>
 
 	<hr>
@@ -16,16 +17,16 @@
 	<!-- table -->
 	<div class="container-fluid">
 		<div id="n_list"></div>
-		<table class="table table-bordered" id="list">
-			<tr>
+		<table class="table table-striped table-responsive-xl" id="list">
+			<tr class="table-primary">
 				<th>id</th><th>제목</th><th>신문사</th><th>상위 분류</th><th>하위 분류</th><th>날짜</th><th>파일크기</th><th>단어수</th><th>문장수</th><th>TXT</th>
 			</tr>
 		</table>
 		<div class="container-fluid text-center" id="noData" style="display: none; font-size: 24px; color: darkgray; padding: 10px 20px 20px 20px">
 			No Data ...
 		</div>
-		<span class="link" onclick="list(null, 1)">첫 페이지</span>
-		<span class="link" id="go_last_page" onclick="list(null, 1)" style="padding: 5px">마지막 페이지</span>
+		<span class="link" onclick="list(1)">첫 페이지</span>
+		<span class="link" id="go_last_page" onclick="list(1)" style="padding: 5px">마지막 페이지</span>
 		<div class="text-center" id="page" style="padding: 0px 20px 20px 20px"></div>
 	</div>
 
@@ -50,11 +51,11 @@
 	<script type="text/javascript">
 		/* execute */
 		document.getElementById("nav-corpus").classList.add('active');
-		list(null, 1);
+		list(1);
 
 
 		/* Http Server */
-		function list(view, page) { //페이지의 뉴스 목록을 가져온다.
+		function list(page) { //페이지의 뉴스 목록을 가져온다.
 			if (page < 1) page = 1;
 			const size = 10; //행 최대개수
 			const newsName = inputform_selNewsName.options[inputform_selNewsName.selectedIndex].value;
@@ -65,14 +66,14 @@
 
 			/* Get news count */
 			let dest = `newscorpus/count?newsName=${newsName}&newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
-			connect("GET", dest, null, function(readyState, status, response) {
+			connect("GET", dest, null, null, function(readyState, status, response) {
 				if (readyState != 4 || status != 200) return;
 				let count = response;
 				const divNlist = document.getElementById("n_list");
 				divNlist.innerText = `총 ${count} 개`;
 				const spanGoLastPage = document.getElementById("go_last_page");
 				spanGoLastPage.onclick = function(e) {
-					list(null, Math.ceil(count / size));
+					list(Math.ceil(count / size));
 				};
 				const btnGroup = document.getElementById("page");
 				while (btnGroup.firstChild)
@@ -90,7 +91,7 @@
 					btn.style.width = '50px';
 					btn.style.margin = '3px 3px 3px 3px';
 					btn.onclick = function(e) {
-						list(null, i);
+						list(i);
 					};
 					btn.className = (i==page)? 'btn btn-primary' : 'btn btn-outline-primary';
 					/* Append */
@@ -111,7 +112,7 @@
 				}
 
 				const dest = `newscorpus/list?page=${page}&size=${size}&newsName=${newsName}&newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
-				connect("GET", dest, null, function(readyState, status, response) {
+				connect("GET", dest, null, null, function(readyState, status, response) {
 					if (readyState != 4 || status != 200) return;
 
 					let rows = JSON.parse(response);
@@ -188,7 +189,7 @@
 
 		function loadContent(title, texturl) { //뉴스 내용을 가져온다.
 			/* Get news text */
-			connect("GET", texturl, null, function(readyState, status, response) {
+			connect("GET", texturl, null, null, function(readyState, status, response) {
 					if (readyState != 4 || status != 200) return;
 
 					let text = response;
@@ -216,6 +217,22 @@
 			const divContent = document.getElementById("content");
 			while (divContent.firstChild)
 				divContent.removeChild(divContent.firstChild);
+		}
+
+		function downloadContent() {
+			const newsName = inputform_selNewsName.options[inputform_selNewsName.selectedIndex].value;
+			const newsCategory = inputform_selCategory.options[inputform_selCategory.selectedIndex].value;
+			const newsDivision = inputform_selDivision.options[inputform_selDivision.selectedIndex].value;
+			let startDate = inputform_startDate.value;
+			let endDate = inputform_endDate.value;
+
+			/* Download news contents */
+			let dest = `newscorpus/download?newsName=${newsName}&newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
+			connect("GET", dest, null, null, function(readyState, status, response) {
+				if (readyState != 4 || status != 200) return;
+				let url = response;
+				window.open(url, '_blank');
+			});
 		}
 
 	</script>

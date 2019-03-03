@@ -18,6 +18,8 @@ class ReutersCrawler extends Crawler {
 
     getNewsBoardUrl(newsCategory, newsDivision, page) {
         let categoryId = this.categoryIds[newsCategory];
+        if (categoryId == undefined)
+            return null;
         return "https://www.reuters.com/news/archive/" + categoryId + "?view=page&page=" + page + "&pageSize=10";
     }
 
