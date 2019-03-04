@@ -21,7 +21,8 @@ class FileManager {
             keepExtensions: false
         });
         this.publicpath = './public';
-        this.txtpath = 'resources/newsText';
+        this.txtpath = 'newsText';
+        this.ssepath = 'sse';
     }
 
     putText(dirpath, filename, text, callback) {
@@ -50,6 +51,21 @@ class FileManager {
                     callback(null);
                 } else {
                     callback(path);
+                }
+            });
+        });
+    }
+
+    updatePipe(sessionId, val, callback) {
+        mkdirp(`${this.publicpath}/${this.ssepath}`, (err) => {
+            const path = `${this.publicpath}/${this.ssepath}/${sessionId}-newscrawling.php`;
+            const text = `data: ${val}\n\n`;
+            fs.writeFile(path, text, 'utf-8', (err1) => {
+                if (err1) {
+                    console.log(err1);
+                    callback(null);
+                } else {
+                    callback(path); //optional
                 }
             });
         });

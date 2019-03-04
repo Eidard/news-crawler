@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head><% include commons/head.ejs %></head>
 
@@ -15,7 +16,7 @@
 	<div class="container-fluid" style="padding: 50px">
 		크롤링 진행도
 		<div class="progress" style="height: 24px">
-			<div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%; height: 24px">
+			<div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" style="width: 0%; height: 24px">
 				0%
 			</div>
 		</div>
@@ -41,6 +42,11 @@
 	<% include commons/util.ejs %>
 
 	<script type="text/javascript">
+		const calStartDate = document.getElementById("startDate");
+		const calEndDate = document.getElementById("endDate");
+		const progressBar = document.getElementById("progressBar");
+		let source = null;
+
 		/* execute */
 		document.getElementById("nav-newscrawling").classList.add('active');
 
@@ -49,15 +55,30 @@
 			const newsName = inputform_selNewsName.options[inputform_selNewsName.selectedIndex].value;
 			const newsCategory = inputform_selCategory.options[inputform_selCategory.selectedIndex].value;
 			const newsDivision = inputform_selDivision.options[inputform_selDivision.selectedIndex].value;
-			const startDate = document.getElementById("startDate").value;
-			const endDate = document.getElementById("endDate").value;
+			const startDate = calStartDate.value;
+			const endDate = calEndDate.value;
 			const dest = `newscrawling/${newsName}?newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
 
 			connect("GET", dest, null, null, function(readyState, status, response) {
 				if (readyState != 4 || status != 200)
 					return;
 
-				// TODO notify crawling status
+				// notify crawling status
+				console.log(response);
+
+				if (typeof(EventSource) != undefined) {
+					if (source != null)
+						source.close();
+					source = new EventSource(response);
+					source.onmessage = (e) => {
+						if (source != null && e.data == 100) {
+							source.close();
+						}
+						const percent = Math.round(e.data * 100) / 100;
+						progressBar.style.width = `${percent}%`;
+						progressBar.innerText = `${percent}%`;
+					}
+				}
 			});
 		}
 

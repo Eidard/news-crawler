@@ -17,13 +17,14 @@ const fileManager = new FileManager();
  */
 class Crawler {
 
-    constructor(newspaper, newsCategory, newsDivision, startDate, endDate) {
+    constructor(newspaper, newsCategory, newsDivision, startDate, endDate, sessionId) {
         this.newspaper = newspaper;
         this.newsCategory = newsCategory;
         this.newsDivision = newsDivision;
         this.startDate = startDate;
         this.endDate = endDate;
         this.argList = [];
+        this.sessionId = sessionId;
     }
 
     /**
@@ -152,9 +153,15 @@ class Crawler {
                 complete: () => {
                     crawlObs.next(newsList);
 
-                    // 다음 페이지 크롤링
-                    let minDate = rows[rows.length-1][2];
+                    const minDate = rows[rows.length-1][2];
 
+                    // 진행도
+                    if (crawler.sessionId != null || crawler.sessionId != undefined) {
+                        const percent = crawler.getDatePercentage(minDate);
+                        fileManager.updatePipe(crawler.sessionId, percent, (path) => { });
+                    }
+
+                    // 다음 페이지 크롤링
                     if (minDate > crawler.startDate)
                         crawler.crawling(page + 1, crawlObs);
                     else
@@ -164,7 +171,7 @@ class Crawler {
         }); //request
     }
 
-    makeLinesEndsWithClose(text) {
+    makeLinesEndsWithClose(text) { //article 한 줄에 한 문장있도록 함
         let toks = text.split(/ +/g);
         if (toks.length == 0)
             return text;
@@ -179,6 +186,24 @@ class Crawler {
                 textLines += (cur + ' ');
         }
         return textLines + toks[i].trim();
+    }
+
+    getDatePercentage(curDate) {
+        if (curDate > endDate) return 0;
+        if (curDate <= startDate) return 100;
+
+        const splitDate = (date) => { return [date.substring(0, 4), date.substring(5, 7), date.substring(8, 10)]; }
+        const subDate = (s, e) => { return (e[2] - s[2]) * 1 + (e[1] - s[1]) * 31 + (e[0] - s[0]) * 365; }
+        const s = splitDate(this.startDate);
+        const c = splitDate(curDate);
+        const e = splitDate(this.endDate);
+
+        const total = subDate(s, e);
+        if (total == 0)
+            return 0;
+
+        const cur = subDate(c, e);
+        return cur * 100 / total;
     }
 
     getNewsBoardUrl(newsCategory, newsDivision, page) { console.log('abstract getNewsBoardUrl'); }

@@ -5,8 +5,8 @@ const Crawler = require('./crawler');
 
 class HeraldCrawler extends Crawler {
 
-    constructor(newsCategory, newsDivision, startDate, endDate) {
-        super("herald", newsCategory, newsDivision, startDate, endDate);
+    constructor(newsCategory, newsDivision, startDate, endDate, sessionId) {
+        super("herald", newsCategory, newsDivision, startDate, endDate, sessionId);
         this.categoryIds = {
             'National': '01',
             'Business': '02',

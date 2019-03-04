@@ -1,6 +1,6 @@
 var express = require('express');
 var session = require('express-session');
-var cookieParser = require('cookie-parser');
+// var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var app = express();
@@ -11,7 +11,13 @@ app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
 
 // 리소스
-app.use(express.static('public'));
+app.use(express.static('public/css'));
+app.use(express.static('public/newsText'));
+app.use(express.static('public/sse', {
+	setHeaders: function(res, path, stat) {
+		res.set('Content-Type', 'text/event-stream')
+	}
+}));
 // app.use(cookieParser());
 // app.use(bodyParser());
 app.use(session({

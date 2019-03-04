@@ -5,8 +5,8 @@ const Crawler = require('./crawler');
 
 class ReutersCrawler extends Crawler {
 
-    constructor(newsCategory, newsDivision, startDate, endDate) {
-        super("reuters", newsCategory, newsDivision, startDate, endDate);
+    constructor(newsCategory, newsDivision, startDate, endDate, sessionId) {
+        super("reuters", newsCategory, newsDivision, startDate, endDate, sessionId);
         this.categoryIds = {
             'Banks': 'banks',
             'Business News': 'businessNews',

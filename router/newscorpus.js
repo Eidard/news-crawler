@@ -74,7 +74,7 @@ function getNewsList(page, size, query, startDate, endDate, reqCallback) {
 function getZipFile(query, startDate, endDate, sessionID, reqCallback) {
     /* Callback */
     const dbConnectCallback = function (connection) {
-        var sql = `SELECT newspaper, category, division, title, texturl FROM ${database.TABLE_NAME} ${queryToSqlWhere(query, startDate, endDate)};`;
+        var sql = `SELECT newspaper, category, division, date, title, texturl FROM ${database.TABLE_NAME} ${queryToSqlWhere(query, startDate, endDate)};`;
         database.query(connection, sql, null, dbQueryCallback);
     }
 
@@ -104,7 +104,7 @@ function getZipFile(query, startDate, endDate, sessionID, reqCallback) {
                         return;
                     }
 
-                    fileManager.textToTextfile(dirpath, `${row.title}.txt`, body, (path) => {
+                    fileManager.textToTextfile(dirpath, `${row.date}-${row.title}.txt`, body, (path) => {
                         if (path == null) {
                             console.log('Fail to create text file');
                             handleError();
@@ -135,7 +135,7 @@ function getZipFile(query, startDate, endDate, sessionID, reqCallback) {
 
                 zipfile.on('close', () => {
                     console.log(`zip file Total ${archive.pointer()} Bytes`);
-                    reqCallback(0, `${fileManager.txtpath}/${sessionID}.zip`);
+                    reqCallback(0, `${sessionID}.zip`);
                     pathList.forEach(path => {
                         fs.unlink(path, (err) => {});
                     });

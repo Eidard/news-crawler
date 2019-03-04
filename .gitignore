@@ -1,3 +1,4 @@
 node_modules/
-public/resources/*
+public/newsText/*
+public/sse/*
 nohup.out
