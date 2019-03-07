@@ -8,17 +8,20 @@
 
 	<!-- input form -->
 	<% include news/inputform.ejs %>
-	<div class="container-fluid text-center">
-		<button type="button" class="btn btn-primary" onclick="getNews(1)">크롤링 시작</button>
+	<div class="container-fluid text-center" style="padding: 50px">
+		<button type="button" class="btn btn-primary" id="btnCrawling" onclick="getNews()">크롤링 시작</button>
 	</div>
 
 	<!-- progress bar -->
-	<div class="container-fluid" style="padding: 50px">
+	<div class="container-fluid" id="divProgress" style="display: none; padding: 50px">
 		크롤링 진행도
 		<div class="progress" style="height: 24px">
 			<div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" style="width: 0%; height: 24px">
 				0%
 			</div>
+		</div>
+		<div class="container text-center" style="padding: 50px; color: darkgrey; font-size: 1.4em">
+			페이지를 나가도 크롤링은 계속 진행됩니다.
 		</div>
 	</div>
 	<!-- db perfection with date -->
@@ -44,6 +47,8 @@
 	<script type="text/javascript">
 		const calStartDate = document.getElementById("startDate");
 		const calEndDate = document.getElementById("endDate");
+		const btnCrawling = document.getElementById("btnCrawling");
+		const divProgress = document.getElementById("divProgress");
 		const progressBar = document.getElementById("progressBar");
 		let source = null;
 
@@ -52,6 +57,9 @@
 
 		/* Http Server */
 		function getNews() { //뉴스 업데이트 요청
+			btnCrawling.style.display = 'none';
+			divProgress.style.display = 'block';
+
 			const newsName = inputform_selNewsName.options[inputform_selNewsName.selectedIndex].value;
 			const newsCategory = inputform_selCategory.options[inputform_selCategory.selectedIndex].value;
 			const newsDivision = inputform_selDivision.options[inputform_selDivision.selectedIndex].value;
@@ -73,6 +81,10 @@
 					source.onmessage = (e) => {
 						if (source != null && e.data == 100) {
 							source.close();
+							setTimeout(() => {
+								btnCrawling.style.display = 'inline';
+								divProgress.style.display = 'none';
+							}, 1500);
 						}
 						const percent = Math.round(e.data * 100) / 100;
 						progressBar.style.width = `${percent}%`;
