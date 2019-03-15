@@ -97,7 +97,7 @@ class Crawler {
             let obsList = [];
 
             for (let i = 0; i < rows.length; i++) {
-                let newsTitle = rows[i][0].replace(/\//g, '\|').replace(/\%/g, ' percent ').trim();//.replace(/\+/g, ' (plus) ').replace(/\%/g, ' percent ').trim();
+                let newsTitle = rows[i][0].replace(/\//g, '\|').replace(/\%/g, ' percent ').trim();
                 let newsUrl = rows[i][1];
                 let newsDate = rows[i][2];
 
@@ -129,8 +129,10 @@ class Crawler {
                                 let textsc = newsText.match(/^.\w*/gm).length;
                                 fileManager.putText(dirname, filename, newsText, (texturl) => {
                                     if (texturl == null) {
-                                        handleReqError();
-                                        return;
+                                        console.log(`fail to upload text file '${filename}'`);
+                                        // TODO: uncomment below after create S3 bucket
+                                        // handleReqError();
+                                        // return;
                                     }
                                     let news = [newsUrl, crawler.newspaper, crawler.newsCategory, crawler.newsDivision, newsDate, newsTitle, texturl, textsize, textwc, textsc];
                                     reqObs.next(news);
@@ -158,7 +160,7 @@ class Crawler {
                     // 진행도
                     if (crawler.sessionId != null || crawler.sessionId != undefined) {
                         const percent = crawler.getDatePercentage(minDate);
-                        fileManager.updatePipe(crawler.sessionId, percent, (path) => { });
+                        fileManager.updatePipe(crawler.sessionId, percent, crawler.argList.length, (path) => {});
                     }
 
                     // 다음 페이지 크롤링
@@ -206,11 +208,11 @@ class Crawler {
         return cur * 100 / total;
     }
 
-    getNewsBoardUrl(newsCategory, newsDivision, page) { console.log('abstract getNewsBoardUrl'); }
+    getNewsBoardUrl(newsCategory, newsDivision, page) { console.log('abstract function getNewsBoardUrl'); }
 
-    parsePage(body, page) { console.log('abstract parsePage'); }
+    parsePage(body, page) { console.log('abstract function parsePage'); }
 
-    parseNewsText(body) { console.log('abstract getNewsText'); }
+    parseNewsText(body) { console.log('abstract function getNewsText'); }
 }
 
 

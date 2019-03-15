@@ -26,7 +26,7 @@ module.exports = function (app) {
             sessionId = req.sessionID;
 
             // response with pipe
-            fileManager.updatePipe(sessionId, 0, (path) => {
+            fileManager.updatePipe(sessionId, 0, 0, (path) => {
                 if (path == null) {
                     res.status(203).end();
                     return;

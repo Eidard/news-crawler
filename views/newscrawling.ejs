@@ -8,6 +8,11 @@
 
 	<!-- input form -->
 	<% include news/inputform.ejs %>
+
+	<div class="container-fluid text-center" id="divTotal" style="display: none; padding: 50px; color: darkgrey; font-size: 1.4em">
+		총 0개 수집완료
+	</div>
+
 	<div class="container-fluid text-center" style="padding: 50px">
 		<button type="button" class="btn btn-primary" id="btnCrawling" onclick="getNews()">크롤링 시작</button>
 	</div>
@@ -50,6 +55,7 @@
 		const btnCrawling = document.getElementById("btnCrawling");
 		const divProgress = document.getElementById("divProgress");
 		const progressBar = document.getElementById("progressBar");
+		const divTotal = document.getElementById("divTotal");
 		let source = null;
 
 		/* execute */
@@ -59,6 +65,10 @@
 		function getNews() { //뉴스 업데이트 요청
 			btnCrawling.style.display = 'none';
 			divProgress.style.display = 'block';
+			divTotal.style.display = 'block';
+			progressBar.style.width = '0%';
+			progressBar.innerText = '0%';
+			divTotal.innerText = '총 0개 수집완료';
 
 			const newsName = inputform_selNewsName.options[inputform_selNewsName.selectedIndex].value;
 			const newsCategory = inputform_selCategory.options[inputform_selCategory.selectedIndex].value;
@@ -79,16 +89,22 @@
 						source.close();
 					source = new EventSource(response);
 					source.onmessage = (e) => {
-						if (source != null && e.data == 100) {
-							source.close();
-							setTimeout(() => {
-								btnCrawling.style.display = 'inline';
-								divProgress.style.display = 'none';
-							}, 1500);
+						if (source != null) {
+							values = e.data.split(' ');
+							const percent = Math.round(values[0] * 100) / 100;
+							const total = values[1];
+
+							if (percent >= 100) {
+								source.close();
+								setTimeout(() => {
+									btnCrawling.style.display = 'inline';
+									divProgress.style.display = 'none';
+								}, 1500);
+							}
+							progressBar.style.width = `${percent}%`;
+							progressBar.innerText = `${percent}%`;
+							divTotal.innerText = `총 ${total}개 수집완료`;
 						}
-						const percent = Math.round(e.data * 100) / 100;
-						progressBar.style.width = `${percent}%`;
-						progressBar.innerText = `${percent}%`;
 					}
 				}
 			});

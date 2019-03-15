@@ -1,9 +1,10 @@
-var express = require('express');
-var session = require('express-session');
-// var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const express = require('express');
+const session = require('express-session');
+// const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const fs = require('fs');
 
-var app = express();
+const app = express();
 
 // 뷰 설정
 app.set('views', __dirname + '/views');
@@ -27,12 +28,12 @@ app.use(session({
 }));
 
 // 라우팅 시작
-var main_router = require('./router/main') (app);
-var newscrawling_router = require('./router/newscrawling') (app);
-var newscorpus_router = require('./router/newscorpus') (app);
-
+const main_router = require('./router/main') (app);
+const newscrawling_router = require('./router/newscrawling') (app);
+const newscorpus_router = require('./router/newscorpus') (app);
 
 // 서버 실행
-var server = app.listen(50000, function() {
-	console.log('server running ...');
+const config = JSON.parse(fs.readFileSync(__dirname + '/private/config.json')).server;
+const server = app.listen(config.port, function() {
+	console.log(`server running port ${config.port}`);
 });

@@ -2,3 +2,6 @@ node_modules/
 public/newsText/*
 public/sse/*
 nohup.out
+private/config.json
+private/credentials.json
+package-lock.json

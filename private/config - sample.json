@@ -1,0 +1,15 @@
+{
+    "server": {
+        "port": "5000"
+    },
+    "db": {
+        "host": "db url",
+        "port": "3306",
+        "database": "newsdatas",
+        "user": "username",
+        "password": "password"
+    },
+    "s3": {
+        "Bucket": "bucket url"
+    }
+}

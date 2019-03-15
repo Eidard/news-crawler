@@ -1,17 +1,20 @@
 /* Database */
+const fs = require('fs');
 const mysql = require('mysql'); //mysql DB 접근
 
 
 class Database {
 
     constructor() {
+        const config = JSON.parse(fs.readFileSync(__dirname + '/../private/config.json')).db;
+
         this.pool = mysql.createPool({
             connectionLimit: 66, //AWS RDS max connection
-            host: 'newsdatas.cwagwpenns80.ap-northeast-2.rds.amazonaws.com',
-            user: 'root',
-            password: 'csedbadmin',
-            port: '3306',
-            database: 'newsdatas'
+            host: config.host,
+            port: config.port,
+            database: config.database,
+            user: config.user,
+            password: config.password
         });
 
         this.TABLE_NAME = "news";
