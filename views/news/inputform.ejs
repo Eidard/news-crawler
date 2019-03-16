@@ -1,30 +1,3 @@
-<div class="jumbotron" style="padding: 20px 60px 20px 60px; margin: 5px 0px">
-	<label for="newsName"><h5>뉴스 / 분야</h5></label>
-	<div class="form-inline">
-		<select class="form-control mr-sm-2" id="newsName" onchange="changeNewsCategory()">
-            <option value="">----- 뉴스 선택 -----</option>
-			<option value="joongang">데일리 중앙</option>
-			<option value="herald">코리아헤럴드</option>
-			<!--<option value="mk">매일경제</option>-->
-			<option value="reuters">로이터</option>
-		</select>
-		<select class="form-control mr-sm-2" id="newsCategory" onchange="changeNewsDivision()">
-            <option value="">----- 상위 분류 -----</option>
-        </select>
-		<select class="form-control mr-sm-2" id="newsDivision">
-            <option value="">----- 하위 분류 -----</option>
-        </select>
-	</div>
-	<br>
-	<label for="startDate"><h5>기간</h5></label>
-    <button type="button" class="btn" onclick="initDate()"><i class="fas fa-eraser"></i></button>
-    <div class="form-inline">
-        <input class="form-control mr-sm-2" id="startDate" type="date" value="">
-        <input class="form-control mr-sm-2" id="endDate" type="date" value="">
-    </div>
-</div>
-
-
 <script type="text/javascript">
 	const inputform_selNewsName = document.getElementById('newsName');
 	const inputform_selCategory = document.getElementById('newsCategory');
@@ -60,10 +33,29 @@
         'joongang': Object.keys(divisions['joongang']),
         'mk': Object.keys(divisions['mk']),
         'reuters': Object.keys(divisions['reuters'])
-    }
+	}
+	const newsNames = {
+		'herald': '코리아헤럴드',
+		'joongang': '데일리 중앙',
+		//'mk': '매일경제',
+		'reuters': '로이터'
+	}
 
-    inputform_selNewsName.selectedIndex = 0;
-    changeNewsCategory();
+
+	/* execute */
+	// 초기선택 (0: 선택안함, 1~: 선택)
+	if (inputform_selNewsName) {
+		inputform_selNewsName.selectedIndex = 0;
+
+		// select 태그에 뉴스이름 추가
+		Object.keys(newsNames).forEach(key => {
+			const newsName = newsNames[key];
+			let option = new Option(newsName, key);
+			inputform_selNewsName.options.add(option);
+		});
+		// select 태그에 뉴스분류명 추가
+		changeNewsCategory();
+	}
 
 
 	/* View Control */
@@ -103,9 +95,4 @@
         inputform_selDivision.selectedIndex = 0;
     }
     
-    function initDate() {
-        inputform_startDate.value = "";
-        inputform_endDate.value = "";
-    }
-
 </script>

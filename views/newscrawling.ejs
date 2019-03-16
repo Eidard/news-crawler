@@ -7,25 +7,46 @@
 	<header><% include commons/header.ejs %></header>
 
 	<!-- input form -->
-	<% include news/inputform.ejs %>
+	<div class="jumbotron" style="padding: 20px 60px 20px 60px">
+		<label for="newsName"><h5>뉴스 / 분야</h5></label>
+		<div class="form-inline">
+			<select class="form-control mr-sm-2" id="newsName" onchange="changeNewsCategory()">
+				<option value="">----- 뉴스 선택 -----</option>
+			</select>
+			<select class="form-control mr-sm-2" id="newsCategory" onchange="changeNewsDivision()">
+				<option value="">----- 상위 분류 -----</option>
+			</select>
+			<select class="form-control mr-sm-2" id="newsDivision">
+				<option value="">----- 하위 분류 -----</option>
+			</select>
+		</div>
+		<br>
+		<label for="startDate"><h5>기간</h5></label>
+		<div class="form-inline">
+			<input class="form-control mr-sm-2" id="startDate" type="date" value="">
+			<input class="form-control mr-sm-2" id="endDate" type="date" value="">
+		</div>
+		<div class="container-fluid text-center" style="margin: 20px 0px 0px 0px">
+			<button type="button" class="btn btn-primary" id="btnCrawling" onclick="getNews()">
+				<span class="spinner-border spinner-border-sm" id="spinnerCrawling" style="display: none"></span>
+				크롤링
+			</button>
+		</div>
+	</div>
 
-	<div class="container-fluid text-center" id="divTotal" style="display: none; padding: 50px; color: darkgrey; font-size: 1.4em">
+	<div class="container-fluid text-center" id="divTotal" style="visibility: hidden; padding: 50px; color: darkgrey; font-size: 1.4em">
 		총 0개 수집완료
 	</div>
 
-	<div class="container-fluid text-center" style="padding: 50px">
-		<button type="button" class="btn btn-primary" id="btnCrawling" onclick="getNews()">크롤링 시작</button>
-	</div>
-
 	<!-- progress bar -->
-	<div class="container-fluid" id="divProgress" style="display: none; padding: 50px">
+	<div class="container-fluid" id="divProgress" style="visibility: hidden; padding: 50px">
 		크롤링 진행도
 		<div class="progress" style="height: 24px">
 			<div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" style="width: 0%; height: 24px">
 				0%
 			</div>
 		</div>
-		<div class="container text-center" style="padding: 50px; color: darkgrey; font-size: 1.4em">
+		<div class="container text-center" style="padding: 60px 0px 0px 0px; color: darkgrey; font-size: 1.4em; height: 221px">
 			페이지를 나가도 크롤링은 계속 진행됩니다.
 		</div>
 	</div>
@@ -47,12 +68,14 @@
 
 
 	<!-- script -->
+	<% include news/inputform.ejs %>
 	<% include commons/util.ejs %>
 
 	<script type="text/javascript">
 		const calStartDate = document.getElementById("startDate");
 		const calEndDate = document.getElementById("endDate");
 		const btnCrawling = document.getElementById("btnCrawling");
+		const spinnerCrawling = document.getElementById("spinnerCrawling");
 		const divProgress = document.getElementById("divProgress");
 		const progressBar = document.getElementById("progressBar");
 		const divTotal = document.getElementById("divTotal");
@@ -61,16 +84,32 @@
 		/* execute */
 		document.getElementById("nav-newscrawling").classList.add('active');
 
-		/* Http Server */
-		function getNews() { //뉴스 업데이트 요청
-			btnCrawling.style.display = 'none';
-			divProgress.style.display = 'block';
-			divTotal.style.display = 'block';
+		/* View Control */
+		function viewOnStartCrawling() {
+			btnCrawling.disabled = true;
+			spinnerCrawling.style.display = 'inherit';
+			divProgress.style.visibility = 'visible';
+			divTotal.style.visibility = 'visible';
 			progressBar.style.width = '0%';
 			progressBar.innerText = '0%';
 			divTotal.innerText = '총 0개 수집완료';
+		}
+		
+		function viewOnStopCrawling() {
+			btnCrawling.disabled = false;
+			spinnerCrawling.style.display = 'none';
+			divProgress.style.visibility = 'hidden';
+		}
 
+		/* Http Server */
+		function getNews() { //뉴스 업데이트 요청
 			const newsName = inputform_selNewsName.options[inputform_selNewsName.selectedIndex].value;
+			if (newsName == '') {
+				return;
+			}
+
+			viewOnStartCrawling();
+
 			const newsCategory = inputform_selCategory.options[inputform_selCategory.selectedIndex].value;
 			const newsDivision = inputform_selDivision.options[inputform_selDivision.selectedIndex].value;
 			const startDate = calStartDate.value;
@@ -80,9 +119,6 @@
 			connect("GET", dest, null, null, function(readyState, status, response) {
 				if (readyState != 4 || status != 200)
 					return;
-
-				// notify crawling status
-				console.log(response);
 
 				if (typeof(EventSource) != undefined) {
 					if (source != null)
@@ -97,8 +133,7 @@
 							if (percent >= 100) {
 								source.close();
 								setTimeout(() => {
-									btnCrawling.style.display = 'inline';
-									divProgress.style.display = 'none';
+									viewOnStopCrawling();
 								}, 1500);
 							}
 							progressBar.style.width = `${percent}%`;

@@ -1,13 +1,67 @@
+/* tags */
 tr {
     text-align: center;
+    font-size: 0.9em;
 }
 
+th, td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media screen and (max-width: 576px) {
+    th, td {
+        max-width: 150px;
+    }
+}
+
+/* events */
 td:hover {
     cursor: pointer;
 }
 
+/* selectors */
 span.link {
     color: DodgerBlue;
     text-decoration: underline;
     cursor: pointer;
+}
+
+.right-sidebox {
+    width: 0;
+    max-height: 60%;
+    position: fixed;
+    right: 0;
+    overflow-x: hidden;
+    transition: 0.5s;
+    background-color: rgb(245, 245, 245);
+}
+
+.readability {
+    overflow-y: scroll;
+    background-color: white;
+    font-size: 16.5px;
+    text-indent: 10px;
+    letter-spacing: 1.8;
+    word-spacing: 1.8;
+    line-height: 1.6;
+}
+
+.pathbox {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.folder {
+    display: inline-block;
+    margin: 20px;
+    cursor: pointer;
+}
+
+.folder-name {
+    max-width: 100px;
+    height: 20px;
+    text-align: center;
 }

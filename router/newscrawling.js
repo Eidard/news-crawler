@@ -38,6 +38,7 @@ module.exports = function (app) {
                 .updateCrawling(function(err) {
                     if (err) {
                         console.log('crawling stopped');
+                        fileManager.updatePipe(sessionId, 100, 0, (path) => {});
                     } else {
                         console.log('crawling done');
                     }
