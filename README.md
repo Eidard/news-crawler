@@ -1,23 +1,43 @@
-## 환경구축
+## 설정
 
 - node.js 설치
+> https://nodejs.org/ko/download/<br>
 
-- news/package.json 에 있는 dependency 설치
-> news.zip 압축 풀기<br>
-> $ cd news/<br>
+- dependency 
+> $ git clone<br>
+> $ cd news-crawler/<br>
 > $ npm install<br>
 
-
-## 배포
-
-- Set PORT
-> /main.js 19번 줄에서 배포할 포트를 설정<br>
-```javascript
-18  // 서버 실행
-19  var server = app.listen(50000, function() {
-20    console.log('server running ...');
-21  });
+- /private/config.json
+```json
+{
+    "server": {
+        "port": "50000"
+    },
+    "db": {
+        "host": "db url",
+        "port": "3306",
+        "database": "newsdatas",
+        "user": "username",
+        "password": "password"
+    },
+    "s3": {
+        "Bucket": "bucket url"
+    }
+}
 ```
+
+- /private/credentials.json
+```json
+{
+    "accessKeyId": "YOUR_ACCESS_KEY_ID",
+    "secretAccessKey": "YOUR_SECRET_ACCESS_KEY",
+    "region": "YOUR_REGION"
+}
+```
+
+
+## 실행
 
 - Launch
 > $ npm start<br>
@@ -28,7 +48,7 @@
 > localhost:50000<br>
 
 
-## 
+## 실행화면
 <table>
   <tr>
     <td>
@@ -40,10 +60,10 @@
   </tr>
   <tr>
     <td>
-      <img src='https://postfiles.pstatic.net/MjAxOTAzMDVfMjgw/MDAxNTUxNzEyMzUzNDg0.JTllVKissqld4c4tGl5UXXtMW4hvzIL5kcvxML8s4U8g.4dQLPbit5PI5Rq2N9C87EZ7TMWLVcbaN4fs6oza53l0g.PNG.dragon20002/1.PNG?type=w773'>
+      <img src='https://postfiles.pstatic.net/MjAxOTAzMTdfMTIy/MDAxNTUyNzcyMTIzNjY2.Env2rijKmDG6heWeLjjboqa9xY4LtX2Ec7fcybi6swsg.CYC6ACtJJbPYH2l1sTHyq9C_7rmJ2qfjBsUE-ADUi38g.PNG.dragon20002/SE-f1f8bb78-54c9-4237-9b3b-fbe142360839.png?type=w773'>
     </td>
     <td>
-      <img src='https://postfiles.pstatic.net/MjAxOTAzMDVfMjgz/MDAxNTUxNzEyMzUzNDgz.ma6F_kBBO7XrV5DCSYXTbrXyx2FheBInVYM8H-JmA9Ug.Qq1iTK3LM_pK33TpWy2GJuE47mTR2JI9hgUpT9Vr1Okg.PNG.dragon20002/2.PNG?type=w773'>
+      <img src='https://postfiles.pstatic.net/MjAxOTAzMTdfMTc0/MDAxNTUyNzcyMTI5NTk1.Jk-u2BoFfKKXJR4wGWzp_nP7y_LN-p39gl_529aavwog.3iOZ-Ei-Bu9nAd-uHpEO-M4fxEh55qanafdRCe0UxoUg.PNG.dragon20002/SE-7896fc3e-6d87-4f7a-af6d-86285b9933d5.png?type=w773'>
     </td>
   </tr>
 </table>
