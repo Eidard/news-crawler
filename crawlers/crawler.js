@@ -174,6 +174,7 @@ class Crawler {
     }
 
     makeLinesEndsWithClose(text) { //article 한 줄에 한 문장있도록 함
+        text = text.replace(/[`＇❛❜‘’]/g, `'`).replace(/[＂❝❞“”]/g, `"`);
         let toks = text.split(/ +/g);
         if (toks.length == 0)
             return text;
@@ -182,7 +183,7 @@ class Crawler {
         let i;
         for (i = 0; i < toks.length - 1; i++) {
             let cur = toks[i].trim();
-            if (cur.match(/.*[.?!][\)"'“]*$/) && toks[i+1].trim().match(/^[\("'“]*[A-Z].*/))
+            if (cur.match(/.*[.?!][\)"']*$/) && toks[i+1].trim().match(/^[\("']*[A-Z].*/))
                 textLines += (cur + '\r\n');
             else
                 textLines += (cur + ' ');

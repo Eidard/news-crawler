@@ -2,6 +2,8 @@
 
 - node.js 설치
 > https://nodejs.org/ko/download/<br>
+> CentOS : curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -<br>
+> Ubuntu : curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -<br>
 
 - dependency
 > $ git clone<br>
@@ -36,6 +38,27 @@
     "region": "YOUR_REGION"
 }
 ```
+
+- DB (mysql)
+테이블 생성
+```sql
+CREATE TABLE `news` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `url` varchar(511) NOT NULL,
+  `newspaper` varchar(15) NOT NULL,
+  `category` varchar(31) NOT NULL,
+  `division` varchar(31) NOT NULL,
+  `date` varchar(15) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `texturl` varchar(1023) NOT NULL,
+  `textsize` int(11) NOT NULL,
+  `textwc` int(11) NOT NULL,
+  `textsc` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `url_UNIQUE` (`url`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+```
+
 
 - AWS S3
 1. AWS Console S3에서 사용할 S3 버켓 선택 -> 상단 탭 '권한' -> 'CORS 구성' -> 아래 소스 붙여넣고 사이트 배포할 URL로 수정한 다음 '저장'<br>
