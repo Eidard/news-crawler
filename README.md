@@ -39,7 +39,7 @@
 }
 ```
 
-- DB (mysql)
+- DB (mysql)<br>
 테이블 생성
 ```sql
 CREATE TABLE `news` (
@@ -62,8 +62,8 @@ CREATE TABLE `news` (
 
 - AWS S3
 1. AWS Console S3에서 사용할 S3 버켓 선택 -> 상단 탭 '권한' -> 'CORS 구성' -> 아래 소스 붙여넣고 사이트 배포할 URL로 수정한 다음 '저장'<br>
-**  http://13.209.193.98:50000는 배포할 사이트 URL<br>
-*** http://localhost:50000는 테스트용
+**  http://13.209.193.98:50000 (예시)는 배포할 사이트 URL<br>
+*** http://localhost:50000 (예시)는 테스트용
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
