@@ -375,13 +375,16 @@
 			];
 
 			let body = null;
-			let currentKey = "newsTitle"; //선택한 항목 종류 (제목or분류1or분류2or뉴스이름)
-			if (newsDivision == "")
-				currentKey = "newsDivision";
-			if (newsCategory == "")
-				currentKey = "newsCategory";
-			if (newsName == "")
+			let currentKey = null; //선택한 항목 종류 (제목or분류1or분류2or뉴스이름)
+			if (categories[newsName] != undefined && categories[newsName].length == 0) { //newsName 있으면
 				currentKey = "newsName";
+			} else if (divisions[newsName][newsCategory] == undefined) { //newsCategory 있으면
+				currentKey = "newsCategory";
+			} else if (divisions[newsName][newsCategory].length != 0) { //newsDivision 목록이 더 있으면
+				currentKey = "newsDivision";
+			} else { //newsDivision 목록이 없으면 newsTitle (Ex. reuters)
+				currentKey = "newsTitle";
+			}
 			if (selectedItems.length != 0)
 				body = `{"key": "${currentKey}", "selectedItems": ["${selectedItems.join('", "')}"]}`;
 
