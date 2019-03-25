@@ -16,11 +16,11 @@ function queryToSqlWhere(query, startDate, endDate) { //필터조건을 추가�
         const key = keys[i];
         const val = query[key];
         if (val != '')
-            query_where += `${key}='${val}' AND `;
+            query_where += `${key}="${val}" AND `;
     }
 
     if (startDate != '' && endDate != '' && startDate <= endDate)
-        query_where += `date BETWEEN '${startDate}' AND '${endDate}'`;
+        query_where += `date BETWEEN "${startDate}" AND "${endDate}"`;
 
     if (query_where.length == 6)
         query_where = '';
@@ -34,7 +34,7 @@ function listToSqlWhere(key, list) { //필터조건 내에서 검색할 항목�
     if (list == undefined || list.length == 0) return "";
     let query_where = '';
     for (let i = 0; i < list.length; i++)
-        query_where += `${key}='${list[i]}' OR `;
+        query_where += `${key}="${list[i]}" OR `;
 
     if (query_where.endsWith('OR '))
         query_where = query_where.substr(0, query_where.length - 4);
