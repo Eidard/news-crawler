@@ -3,6 +3,7 @@ const AWS = require('aws-sdk');
 const formidable = require('formidable');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
+const rimraf = require('rimraf');
 
 class FileManager {
 
@@ -76,6 +77,12 @@ class FileManager {
                     callback(path);
                 }
             });
+        });
+    }
+
+    removeDir(dirpath, callback) {
+        rimraf(`${this.publicpath}/${this.txtpath}/${dirpath}`, (err) => {
+            callback();
         });
     }
 }

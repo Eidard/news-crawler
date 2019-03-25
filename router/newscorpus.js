@@ -9,8 +9,8 @@ const FileManager = require('./../services/file-manager');
 const database = new Database();
 const fileManager = new FileManager();
 
-function queryToSqlWhere(query, startDate, endDate) {
-    let query_where = 'WHERE ';
+function queryToSqlWhere(query, startDate, endDate) { //필터조건을 추가한다.
+    let query_where = '';
     const keys = Object.keys(query);
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
@@ -30,11 +30,27 @@ function queryToSqlWhere(query, startDate, endDate) {
     return query_where;
 }
 
+function listToSqlWhere(key, list) { //필터조건 내에서 검색할 항목을 추가한다.
+    if (list == undefined || list.length == 0) return "";
+    let query_where = '';
+    for (let i = 0; i < list.length; i++)
+        query_where += `${key}='${list[i]}' OR `;
+
+    if (query_where.endsWith('OR '))
+        query_where = query_where.substr(0, query_where.length - 4);
+
+    return query_where;
+}
+
 /* HTTP GET Method's Functions */
 function getNewsCount(query, startDate, endDate, reqCallback) {
     /* Callback */
     const dbConnectCallback = function (connection) {
-        var sql = `SELECT id FROM ${database.TABLE_NAME} ${queryToSqlWhere(query, startDate, endDate)};`;
+        let sqlWhere = queryToSqlWhere(query, startDate, endDate);
+        if (sqlWhere.length != 0)
+            sqlWhere = 'WHERE ' + sqlWhere;
+
+        var sql = `SELECT id FROM ${database.TABLE_NAME} ${sqlWhere};`;
         database.query(connection, sql, null, dbQueryCallback);
     }
 
@@ -55,7 +71,11 @@ function getNewsList(page, size, query, startDate, endDate, reqCallback) {
     const dbConnectCallback = function (connection) {
         if (page < 1) page = 1;
         const start = size * (page - 1);
-        var sql = `SELECT * FROM ${database.TABLE_NAME} ${queryToSqlWhere(query, startDate, endDate)} ORDER BY date DESC LIMIT ${start}, ${size};`;
+        let sqlWhere = queryToSqlWhere(query, startDate, endDate);
+        if (sqlWhere.length != 0)
+            sqlWhere = 'WHERE ' + sqlWhere;
+
+        var sql = `SELECT * FROM ${database.TABLE_NAME} ${sqlWhere} ORDER BY date DESC LIMIT ${start}, ${size};`;
         database.query(connection, sql, null, dbQueryCallback);
     }
 
@@ -71,10 +91,19 @@ function getNewsList(page, size, query, startDate, endDate, reqCallback) {
     database.connect(dbConnectCallback);
 }
 
-function getZipFile(query, startDate, endDate, sessionID, reqCallback) {
+function getZipFile(query, startDate, endDate, key, selectedItems, sessionID, reqCallback) {
     /* Callback */
     const dbConnectCallback = function (connection) {
-        var sql = `SELECT newspaper, category, division, date, title, texturl FROM ${database.TABLE_NAME} ${queryToSqlWhere(query, startDate, endDate)};`;
+        let sqlWhere = queryToSqlWhere(query, startDate, endDate);
+        if (sqlWhere.length != 0)
+            sqlWhere += ` AND (${listToSqlWhere(key, selectedItems)})`;
+        else
+            sqlWhere += listToSqlWhere(key, selectedItems);
+        if (sqlWhere.length != 0)
+            sqlWhere = 'WHERE ' + sqlWhere;
+
+        var sql = `SELECT newspaper, category, division, date, title, texturl FROM ${database.TABLE_NAME} ${sqlWhere};`;
+        console.log(sql);
         database.query(connection, sql, null, dbQueryCallback);
     }
 
@@ -90,7 +119,7 @@ function getZipFile(query, startDate, endDate, sessionID, reqCallback) {
                 dirpath = `${sessionID}/${row.newspaper}/${row.category}/${row.division}`;
             else
                 dirpath = `${sessionID}/${row.newspaper}/${row.category}`;
-            
+
             let obs$ = Observable.create((reqObs) => {
                 const handleError = (err) => {
                     obsList = [];
@@ -152,7 +181,9 @@ function getZipFile(query, startDate, endDate, sessionID, reqCallback) {
     } //db query callback
 
     /* execute */
-    database.connect(dbConnectCallback);
+    fileManager.removeDir(sessionID, () => {
+        database.connect(dbConnectCallback);
+    });
 }
 
 
@@ -198,7 +229,7 @@ module.exports = function (app) {
         });
     });
 
-    app.get('/newscorpus/download', function (req, res) {
+    app.post('/newscorpus/download', function (req, res) {
         console.log(req.route.path);
         query = {
             'newspaper': req.query.newsName,
@@ -208,7 +239,20 @@ module.exports = function (app) {
         startDate = req.query.startDate;
         endDate = req.query.endDate;
 
-        getZipFile(query, startDate, endDate, req.sessionID, function (err, filepath) {
+        array = {
+            'newsName': 'newspaper',
+            'newsCategory': 'category',
+            'newsDivision': 'division',
+            'newsTitle': 'title'
+        }
+        key = array[req.body.key];
+        selectedItems = req.body.selectedItems;
+        if (selectedItems == undefined || selectedItems.length == 0) {
+            res.status(203).send().end();
+            return;
+        }
+
+        getZipFile(query, startDate, endDate, key, selectedItems, req.sessionID, function (err, filepath) {
             if (err) {
                 res.status(203).end();
                 return;

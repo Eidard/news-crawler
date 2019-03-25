@@ -63,7 +63,7 @@
 	</div>
 
 	<!-- folders -->
-	<div class="container-fluid" id="divMain" style="padding: 20px; height: 762px">
+	<div class="container-fluid" id="divMain" style="padding: 20px; height: 762px; overflow: auto">
 	</div>
 
 	<footer><% include commons/footer.ejs %></footer>
@@ -91,8 +91,9 @@
 		/* Data */
 		const ROOT_PATH = 'NEWS';
 		let currentPath = ROOT_PATH;
-		let newsArgs = {"newsName": "", "newsCategory": "", "newsDivision": ""};
+		let newsArgs = {"newsName": "", "newsCategory": "", "newsDivision": ""}; //현재 경로 내용
 		let lastNextName = []; //앞으로 갈 때 이동할 필터명
+		let selectedItems = []; //선택된 폴더 OR 뉴스 (다운로드 리스트)
 
 		/* execute */
 		document.getElementById("nav-corpus").classList.add('active');
@@ -118,21 +119,27 @@
 		function showFolders() {
 			let svgHtml = '';
 			let list = null;
+			newsArgs = {"newsName": "", "newsCategory": "", "newsDivision": ""};
+			selectedItems.length = 0; //clear list
+
 			if (currentPath == ROOT_PATH) {
 				list = Object.keys(newsNames);
 			} else {
 				const pathNames = currentPath.split('/');
-				newsArgs = {"newsName": "", "newsCategory": "", "newsDivision": ""};
 				if (pathNames.length == 2) { //category
 					list = categories[pathNames[1]];
 					newsArgs['newsName'] = pathNames[1];
 				} else if (pathNames.length == 3) { //division
 					list = divisions[pathNames[1]][pathNames[2]];
+					newsArgs['newsName'] = pathNames[1];
 					newsArgs['newsCategory'] = pathNames[2];
 				} else {
+					newsArgs['newsName'] = pathNames[1];
+					newsArgs['newsCategory'] = pathNames[2];
 					newsArgs['newsDivision'] = pathNames[3];
 				}
 			}
+			console.log(newsArgs);
 
 			if (!list || list.length == 0) {
 				loadNewsList(1);
@@ -142,7 +149,7 @@
 			list.forEach(val => {
 				const firstLet = val[0].toUpperCase();
 				svgHtml += `
-<button class="btn folder" onclick="moveNextPath('${val}')">
+<button class="btn folder" onclick="selectItem(this, '${val}')" ondblclick="moveNextPath('${val}')">
 	<svg height="100" width="100">
 		<polygon points="0,0 40,0 50,10 100,10 100,100 0,100" fill="antiquewhite" />
 		<text x="50" y="85" font-size="90" fill="coral" text-anchor="middle">${firstLet}</text>
@@ -153,6 +160,23 @@
 			});
 			divMain.style.display = 'block';
 			divMain.innerHTML = svgHtml;
+		}
+
+		function selectItem(v, name) {
+			v.style.backgroundColor = 'lightsalmon';
+			v.onclick = (e) => {
+				unselectItem(v, name);
+			}
+			selectedItems.push(name);
+		}
+
+		function unselectItem(v, name) {
+			v.style.backgroundColor = null;
+			v.onclick = (e) => {
+				selectItem(v, name);
+			}
+			let delIdx = selectedItems.indexOf(name);
+			selectedItems.splice(delIdx, 1);
 		}
 
 		function movePrevPath() {
@@ -281,24 +305,15 @@
 						iTxtIcon.style = 'font-size:24px';
 
 						tr.onclick = function(e) {
+							selectItem(tr, row.title);
+						};
+
+						tr.ondblclick = function(e) {
 							closeContent();
 							if (row.texturl != "") {
 								loadContent(row.title, row.texturl);
 							}
 						};
-						
-						tr.onmouseover = function(e) {
-								tr.style.backgroundColor = 'DodgerBlue';
-								tr.style.color = 'White';
-								aTitUrl.style.color = 'White';
-								aTxtUrl.style.color = 'White';
-							};
-						tr.onmouseout = function(e) {
-								tr.style.backgroundColor = 'White';
-								tr.style.color = '';
-								aTitUrl.style.color = '';
-								aTxtUrl.style.color = '';
-							};
 
 						/* Append */
 						tr.appendChild(tdId);
@@ -354,8 +369,30 @@
 
 			/* Download news contents */
 			let dest = `newscorpus/download?newsName=${newsName}&newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
-			connect("GET", dest, null, null, function(readyState, status, response) {
-				if (readyState != 4 || status != 200) return;
+
+			let headers = [
+				{'name': 'Content-Type', 'value': 'application/json'}
+			];
+
+			let body = null;
+			let currentKey = "newsTitle"; //선택한 항목 종류 (제목or분류1or분류2or뉴스이름)
+			if (newsDivision == "")
+				currentKey = "newsDivision";
+			if (newsCategory == "")
+				currentKey = "newsCategory";
+			if (newsName == "")
+				currentKey = "newsName";
+			if (selectedItems.length != 0)
+				body = `{"key": "${currentKey}", "selectedItems": ["${selectedItems.join('", "')}"]}`;
+
+			connect("POST", dest, headers, body, function(readyState, status, response) {
+				if (readyState != 4) return;
+				if (status == 203) {
+					alert('내려받을 항목을 선택해주세요.');
+					return;
+				}
+				if (status != 200) return;
+
 				let url = response;
 				window.open(url, '_blank');
 			});
