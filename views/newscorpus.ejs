@@ -42,10 +42,37 @@
 		</div>
 	</div></div></div>
 
-	
-	<!-- table -->
+	<!-- table container -->
 	<div class="container-fluid" id="newsTable" style="display: none; margin: 10px 0px; height: 742px">
-		<div id="n_list"></div>
+		<!-- total -->
+		<form class="form-inline">
+			<div class="input-group my-1 mr-1">
+				<div class="input-group-prepend">
+					<span class="input-group-text">총 개수</label>
+				</div>
+				<span class="form-control" id="newsTotal">0</span>
+			</div>
+			<div class="input-group my-1 mr-1">
+				<div class="input-group-prepend">
+					<span class="input-group-text">파일크기</label>
+				</div>
+				<span class="form-control" id="newsFileSize">0</span>
+			</div>
+			<div class="input-group my-1 mr-1">
+				<div class="input-group-prepend">
+					<span class="input-group-text">단어 수</label>
+				</div>
+				<span class="form-control" id="newsWordCount">0</span>
+			</div>
+			<div class="input-group my-1">
+				<div class="input-group-prepend">
+					<span class="input-group-text">문장 수</label>
+				</div>
+				<span class="form-control" id="newsSentenceCount">0</span>
+			</div>
+		</form>
+		
+		<!-- table -->
 		<div style="overflow-x: auto">
 			<table class="table table-striped" id="list">
 				<tr class="table-primary">
@@ -139,7 +166,6 @@
 					newsArgs['newsDivision'] = pathNames[3];
 				}
 			}
-			console.log(newsArgs);
 
 			if (!list || list.length == 0) {
 				loadNewsList(1);
@@ -221,9 +247,18 @@
 			let dest = `newscorpus/count?newsName=${newsName}&newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
 			connect("GET", dest, null, null, function(readyState, status, response) {
 				if (readyState != 4 || status != 200) return;
-				let count = response;
-				const divNlist = document.getElementById("n_list");
-				divNlist.innerText = `총 ${count} 개`;
+				let result = JSON.parse(response);
+				let count = result.count;
+
+				const spanNewsTotal = document.getElementById("newsTotal");
+				spanNewsTotal.innerText = count + " 개";
+				const spanNewsFileSize = document.getElementById("newsFileSize");
+				spanNewsFileSize.innerText = Math.round(result.fs / 1024 * 10) / 10 + " KB";
+				const spanNewsWordCount = document.getElementById("newsWordCount");
+				spanNewsWordCount.innerText = result.wc + " 개";
+				const spanNewsSentenceCount = document.getElementById("newsSentenceCount");
+				spanNewsSentenceCount.innerText = result.sc + " 개";
+
 				const spanGoLastPage = document.getElementById("go_last_page");
 				spanGoLastPage.onclick = function(e) {
 					loadNewsList(Math.ceil(count / size));
@@ -305,7 +340,7 @@
 						iTxtIcon.style = 'font-size:24px';
 
 						tr.onclick = function(e) {
-							selectItem(tr, row.title);
+							selectItem(tr, row.id);
 						};
 
 						tr.ondblclick = function(e) {
@@ -380,10 +415,10 @@
 				currentKey = "newsName";
 			} else if (divisions[newsName][newsCategory] == undefined) { //newsCategory 있으면
 				currentKey = "newsCategory";
-			} else if (divisions[newsName][newsCategory].length != 0) { //newsDivision 목록이 더 있으면
+			} else if (divisions[newsName][newsCategory].length != 0 && newsDivision == "") { //newsDivision 목록이 더 있으면
 				currentKey = "newsDivision";
-			} else { //newsDivision 목록이 없으면 newsTitle (Ex. reuters)
-				currentKey = "newsTitle";
+			} else { //newsDivision 목록이 없으면 newsId (Ex. reuters)
+				currentKey = "newsId";
 			}
 			if (selectedItems.length != 0)
 				body = `{"key": "${currentKey}", "selectedItems": ["${selectedItems.join('", "')}"]}`;

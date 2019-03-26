@@ -50,14 +50,14 @@ function getNewsCount(query, startDate, endDate, reqCallback) {
         if (sqlWhere.length != 0)
             sqlWhere = 'WHERE ' + sqlWhere;
 
-        var sql = `SELECT id FROM ${database.TABLE_NAME} ${sqlWhere};`;
+        var sql = `SELECT count(*) as count, sum(textsize) as fs, sum(textwc) as wc, sum(textsc) as sc FROM ${database.TABLE_NAME} ${sqlWhere};`;
         database.query(connection, sql, null, dbQueryCallback);
     }
 
     const dbQueryCallback = function (connection, rows) {
         database.disconnect(connection, function () { });
         if (rows.length >= 0)
-            reqCallback(0, rows.length);
+            reqCallback(0, rows[0]);
         else
             reqCallback(1, null);
     }
@@ -199,12 +199,12 @@ module.exports = function (app) {
         startDate = req.query.startDate;
         endDate = req.query.endDate;
 
-        getNewsCount(query, startDate, endDate, function (err, count) {
+        getNewsCount(query, startDate, endDate, function (err, result) {
             if (err) {
                 res.status(203).end();
                 return;
             }
-            res.status(200).send(`${count}`).end();
+            res.status(200).send(result).end();
         });
     });
 
@@ -243,7 +243,7 @@ module.exports = function (app) {
             'newsName': 'newspaper',
             'newsCategory': 'category',
             'newsDivision': 'division',
-            'newsTitle': 'title'
+            'newsId': 'id'
         }
         key = array[req.body.key];
         selectedItems = req.body.selectedItems;
