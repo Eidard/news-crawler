@@ -15,11 +15,11 @@ function queryToSqlWhere(query, startDate, endDate) { //필터조건을 추가�
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
         const val = query[key];
-        if (val != '')
+        if (val != undefined && val != '')
             query_where += `${key}="${val}" AND `;
     }
 
-    if (startDate != '' && endDate != '' && startDate <= endDate)
+    if (startDate != undefined && endDate != undefined && startDate != '' && endDate != '' && startDate <= endDate)
         query_where += `date BETWEEN "${startDate}" AND "${endDate}"`;
 
     if (query_where.length == 6)

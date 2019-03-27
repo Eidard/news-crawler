@@ -173,19 +173,24 @@
 			}
 
 			list.forEach(val => {
-				const firstLet = val[0].toUpperCase();
+				const firstLetter = val[0].toUpperCase();
 				svgHtml += `
 <button class="btn folder" onclick="selectItem(this, '${val}')" ondblclick="moveNextPath('${val}')">
 	<svg height="100" width="100">
 		<polygon points="0,0 40,0 50,10 100,10 100,100 0,100" fill="antiquewhite" />
-		<text x="50" y="85" font-size="90" fill="coral" text-anchor="middle">${firstLet}</text>
+		<text x="50" y="85" font-size="90" fill="coral" text-anchor="middle">${firstLetter}</text>
 	</svg>
-	<div class="folder-name">${val}</div>
+	<div class="folder-name" id="folder_${val}">
+		${val}
+		<span class="spinner-border spinner-border-sm" id="spinner_${val}"></span>
+	</div>
 </button>
 				`;
 			});
 			divMain.style.display = 'block';
 			divMain.innerHTML = svgHtml;
+
+			loadFolders(list); //각 폴더이름 옆에 기사개수 로드
 		}
 
 		function selectItem(v, name) {
@@ -230,6 +235,43 @@
 		}
 
 		/* Http Server */
+		function loadFolders(folderList) { //각 폴더이름 옆에 기사개수 로드
+			folderList.forEach(val => {
+				let newsName = newsArgs["newsName"];
+				let newsCategory = newsArgs["newsCategory"];
+				let newsDivision = newsArgs["newsDivision"];
+
+				let suffix = "";
+				if (newsName != "") {
+					suffix += `?newsName=${newsName}`;
+					if (newsCategory != "") {
+						suffix += `&newsCategory=${newsCategory}`;
+						if (newsDivision != "") {
+							suffix += `&newsDivision=${newsDivision}`;
+						} else {
+							suffix += `&newsDivision=${val}`;
+						}
+					} else {
+						suffix += `&newsCategory=${val}`;
+					}
+				} else {
+					suffix += `?newsName=${val}`;
+				}
+				let dest = `newscorpus/count${suffix}`;
+				connect("GET", dest, null, null, function(readyState, status, response) {
+					if (readyState != 4) return;
+					document.getElementById(`spinner_${val}`).style.display = 'none';
+					if (status != 200) return;
+
+					let result = JSON.parse(response);
+					let count = result.count;
+
+					let divFolder = document.getElementById(`folder_${val}`);
+					divFolder.innerText = `${val} (${count})`;
+				});
+			});
+		}
+
 		function loadNewsList(page) { //페이지의 뉴스 목록을 가져온다.
 			divMain.style.display = 'none';
 			newsTable.style.display = 'block';
@@ -395,12 +437,11 @@
 		}
 
 		function downloadContent() {
-			let newsName = "", newsCategory = "", newsDivision = "", startDate = "", endDate = "";
-			newsName = newsArgs["newsName"];
-			newsCategory = newsArgs["newsCategory"];
-			newsDivision = newsArgs["newsDivision"];
-			startDate = inputform_startDate.value;
-			endDate = inputform_endDate.value;
+			let newsName = newsArgs["newsName"];
+			let newsCategory = newsArgs["newsCategory"];
+			let newsDivision = newsArgs["newsDivision"];
+			let startDate = inputform_startDate.value;
+			let endDate = inputform_endDate.value;
 
 			/* Download news contents */
 			let dest = `newscorpus/download?newsName=${newsName}&newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
