@@ -93,6 +93,24 @@
 	<div class="container-fluid" id="divMain" style="padding: 20px; height: 762px; overflow: auto">
 	</div>
 
+	<!-- root's total table -->
+	<div class="container" style="margin: 10px 0px; position: absolute; top: 650px; overflow-x: auto">
+		<table class="table table-striped" id="rootNewsTotal" style="display: none">
+			<tr class="table-primary">
+				<th>신문사</th><th>뉴스개수</th><th>파일크기</th><th>단어수</th><th>문장수</th>
+			</tr>
+			<tr id="rootNewsTotal_herald">
+				<td>herald</td><td>0개</td><td>0 KB</td><td>0 개</td><td>0 개</td>
+			</tr>
+			<tr id="rootNewsTotal_joongang">
+				<td>joongang</td><td>0개</td><td>0 KB</td><td>0 개</td><td>0 개</td>
+			</tr>
+			<tr id="rootNewsTotal_reuters">
+				<td>reuters</td><td>0개</td><td>0 KB</td><td>0 개</td><td>0 개</td>
+			</tr>
+		</table>
+	</div>
+
 	<footer><% include commons/footer.ejs %></footer>
 
 	<!-- top button -->
@@ -236,31 +254,39 @@
 
 		/* Http Server */
 		function loadFolders(folderList) { //각 폴더이름 옆에 기사개수 로드
-			folderList.forEach(val => {
-				let newsName = newsArgs["newsName"];
-				let newsCategory = newsArgs["newsCategory"];
-				let newsDivision = newsArgs["newsDivision"];
+			let newsName = newsArgs["newsName"];
+			let newsCategory = newsArgs["newsCategory"];
+			let newsDivision = newsArgs["newsDivision"];
 
-				let suffix = "";
-				if (newsName != "") {
-					suffix += `?newsName=${newsName}`;
-					if (newsCategory != "") {
-						suffix += `&newsCategory=${newsCategory}`;
-						if (newsDivision != "") {
-							suffix += `&newsDivision=${newsDivision}`;
-						} else {
-							suffix += `&newsDivision=${val}`;
-						}
+			let suffix = "";
+			let suffixKey = "";
+			let isRoot = false;
+			if (newsName != "") {
+				suffix += `?newsName=${newsName}`;
+				if (newsCategory != "") {
+					suffix += `&newsCategory=${newsCategory}`;
+					if (newsDivision != "") {
+						suffix += `&newsDivision=${newsDivision}`;
 					} else {
-						suffix += `&newsCategory=${val}`;
+						suffixKey = "&newsDivision=";
 					}
 				} else {
-					suffix += `?newsName=${val}`;
+					suffixKey = "&newsCategory=";
 				}
-				let dest = `newscorpus/count${suffix}`;
+			} else {
+				suffixKey = "?newsName=";
+				isRoot = true;
+			}
+
+			document.getElementById('rootNewsTotal').style.display = isRoot ? 'block' : 'none';
+
+			folderList.forEach(val => {
+				let dest = `newscorpus/count${suffix}${suffixKey}${val}`;
 				connect("GET", dest, null, null, function(readyState, status, response) {
 					if (readyState != 4) return;
-					document.getElementById(`spinner_${val}`).style.display = 'none';
+					let spinner = document.getElementById(`spinner_${val}`);
+					if (spinner != undefined)
+						spinner.style.display = 'none';
 					if (status != 200) return;
 
 					let result = JSON.parse(response);
@@ -268,6 +294,15 @@
 
 					let divFolder = document.getElementById(`folder_${val}`);
 					divFolder.innerText = `${val} (${count})`;
+
+					if (isRoot) {
+						let tr = document.getElementById(`rootNewsTotal_${val}`);
+						let tds = tr.getElementsByTagName('td');
+						tds[1].innerText = count + " 개";
+						tds[2].innerText = Math.round(result.fs / 1024 * 10) / 10 + " KB";
+						tds[3].innerText = result.wc + " 개";
+						tds[4].innerText = result.sc + " 개";
+					}
 				});
 			});
 		}
