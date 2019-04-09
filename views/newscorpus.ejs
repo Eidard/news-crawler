@@ -298,10 +298,10 @@
 					if (isRoot) {
 						let tr = document.getElementById(`rootNewsTotal_${val}`);
 						let tds = tr.getElementsByTagName('td');
-						tds[1].innerText = count + " 개";
-						tds[2].innerText = Math.round(result.fs / 1024 * 10) / 10 + " KB";
-						tds[3].innerText = result.wc + " 개";
-						tds[4].innerText = result.sc + " 개";
+						tds[1].innerText = numberWithCommas(count) + " 개";
+						tds[2].innerText = numberWithCommas(Math.round(result.fs / 1024 * 10) / 10) + " KB";
+						tds[3].innerText = numberWithCommas(result.wc) + " 개";
+						tds[4].innerText = numberWithCommas(result.sc) + " 개";
 					}
 				});
 			});
@@ -328,13 +328,13 @@
 				let count = result.count;
 
 				const spanNewsTotal = document.getElementById("newsTotal");
-				spanNewsTotal.innerText = count + " 개";
+				spanNewsTotal.innerText = numberWithCommas(count) + " 개";
 				const spanNewsFileSize = document.getElementById("newsFileSize");
-				spanNewsFileSize.innerText = Math.round(result.fs / 1024 * 10) / 10 + " KB";
+				spanNewsFileSize.innerText = numberWithCommas(Math.round(result.fs / 1024 * 10) / 10) + " KB";
 				const spanNewsWordCount = document.getElementById("newsWordCount");
-				spanNewsWordCount.innerText = result.wc + " 개";
+				spanNewsWordCount.innerText = numberWithCommas(result.wc) + " 개";
 				const spanNewsSentenceCount = document.getElementById("newsSentenceCount");
-				spanNewsSentenceCount.innerText = result.sc + " 개";
+				spanNewsSentenceCount.innerText = numberWithCommas(result.sc) + " 개";
 
 				const spanGoLastPage = document.getElementById("go_last_page");
 				spanGoLastPage.onclick = function(e) {

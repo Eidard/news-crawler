@@ -1,4 +1,11 @@
 <script type="text/javascript">
+
+	function numberWithCommas(x) {
+		var parts = x.toString().split(".");
+		parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		return parts.join(".");
+	}
+
 	/* Http Server */
 	function connect(type, dest, header, body, callback) { //ajax http 연결
 		let xmlhttp;
