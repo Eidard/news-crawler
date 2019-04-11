@@ -126,19 +126,30 @@
 					source = new EventSource(response);
 					source.onmessage = (e) => {
 						if (source != null) {
-							values = e.data.split(' ');
-							const percent = Math.round(values[0] * 100) / 100;
-							const total = values[1];
+							console.log(e);
+							list = JSON.parse(e.data);
+							for (let i = 0; i < list.length; i++) {
+								row = list[i];
+								if (row.newspaper == newsName
+										&& row.newsCategory == newsCategory
+										&& row.newsDivision == newsDivision
+										&& row.startDate == startDate
+										&& row.endDate == endDate) {
+									const percent = Math.round(row.percent * 100) / 100;
+									const total = row.total;
 
-							if (percent >= 100) {
-								source.close();
-								setTimeout(() => {
-									viewOnStopCrawling();
-								}, 1500);
+									if (percent >= 100) {
+										source.close();
+										setTimeout(() => {
+											viewOnStopCrawling();
+										}, 1500);
+									}
+									progressBar.style.width = `${percent}%`;
+									progressBar.innerText = `${percent}%`;
+									divTotal.innerText = `총 ${total}개 수집완료`;
+									break;
+								}
 							}
-							progressBar.style.width = `${percent}%`;
-							progressBar.innerText = `${percent}%`;
-							divTotal.innerText = `총 ${total}개 수집완료`;
 						}
 					}
 				}

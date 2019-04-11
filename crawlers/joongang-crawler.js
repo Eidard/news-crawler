@@ -81,7 +81,8 @@ class JoongangCrawler extends Crawler {
             let newsTitle = $('.title_cr').eq(i).text().trim();
             let newsUrl = 'http://koreajoongangdaily.joins.com' + $('.title_cr').eq(i).attr("href");
             let newsDate = this.formatDate($('.date').eq(i).text().trim());
-            rows.push([newsTitle, newsUrl, newsDate]);
+            if (newsDate != null)
+                rows.push([newsTitle, newsUrl, newsDate]);
         }
 
         return rows;
@@ -95,6 +96,7 @@ class JoongangCrawler extends Crawler {
     }
 
     formatDate(date) {
+        if (date == '') return null;
         let month = date.substring(0, 3);
         switch (month) {
             case "Jan": month = "01"; break;
@@ -109,11 +111,16 @@ class JoongangCrawler extends Crawler {
             case "Oct": month = "10"; break;
             case "Nov": month = "11"; break;
             case "Dec": month = "12"; break;
+            default: month = undefined;
         }
         let buf = date.split(" ");
-        let day = buf[1].substring(0, 2);
-        let year = buf[1].substring(3);
-        return `${year}-${month}-${day}`;
+        if (month != undefined && buf.length > 0) {
+            let day = buf[1].substring(0, 2);
+            let year = buf[1].substring(3);
+            return `${year}-${month}-${day}`;
+        } else {
+            return null;
+        }
     }
 }
 

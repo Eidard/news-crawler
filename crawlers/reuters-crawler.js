@@ -31,7 +31,8 @@ class ReutersCrawler extends Crawler {
             let newsTitle = $('.story-title').eq(i).text().trim();
             let newsUrl = 'https://www.reuters.com' + $('.story-photo').eq(i).find('a').attr("href");
             let newsDate = this.formatDate($('.timestamp').eq(i).text().trim());
-            rows.push([newsTitle, newsUrl, newsDate]);
+            if (newsDate != null) //뉴스게시판에서 행이 비어있을 경우 날짜가 null이 된다.
+                rows.push([newsTitle, newsUrl, newsDate]);
         }
 
         return rows;
@@ -49,6 +50,7 @@ class ReutersCrawler extends Crawler {
     }
 
     formatDate(date) {
+        if (date == '') return null;
         let buf = date.split(" ");
         let year, month, day;
         if (buf.length == 2) { // ex. 2:41AM EST
@@ -72,10 +74,14 @@ class ReutersCrawler extends Crawler {
                 case "Oct": month = "10"; break;
                 case "Nov": month = "11"; break;
                 case "Dec": month = "12"; break;
+                default: month = undefined;
             }
             day = buf[1];
             year = buf[2];
         }
+        if (year == undefined || month == undefined || day == undefined)
+            return null;
+
         return `${year}-${month}-${day}`;
     }
 }

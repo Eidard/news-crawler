@@ -26,23 +26,31 @@ module.exports = function (app) {
             sessionId = req.sessionID;
 
             // response with pipe
-            fileManager.updatePipe(sessionId, 0, 0, (path) => {
+            let pipeRow = {
+                "newspaper": newsNames[i], "newsCategory": newsCategory, "newsDivision": newsDivision,
+                "startDate": startDate, "endDate": endDate,
+                "percent": 0, "total": 0
+            };
+            fileManager.updatePipe(sessionId, pipeRow, (path, exist) => {
                 if (path == null) {
                     res.status(203).end();
                     return;
                 }
                 res.status(200).end(`${sessionId}-newscrawling.php`);
-            });
 
-            newsCrawlers[newsNames[i]](newsCategory, newsDivision, startDate, endDate, sessionId)
-                .updateCrawling(function(err) {
-                    if (err) {
-                        console.log('crawling stopped');
-                        fileManager.updatePipe(sessionId, 100, 0, (path) => {});
-                    } else {
-                        console.log('crawling done');
-                    }
-                });
+                if (exist) return; //이미 같은 세션에서 같은 크롤링 요청을 처리 중인 파이프가 존재하면 새로 크롤링하지 않는다.
+
+                newsCrawlers[newsNames[i]](newsCategory, newsDivision, startDate, endDate, sessionId)
+                    .updateCrawling(function(err) {
+                        if (err) {
+                            console.log('crawling stopped');
+                            pipeRow.percent = 100;
+                            fileManager.updatePipe(sessionId, pipeRow, (path, exist) => {});
+                        } else {
+                            console.log('crawling done');
+                        }
+                    });
+            });
         });
     }
 }

@@ -155,16 +155,29 @@ class Crawler {
                 complete: () => {
                     crawlObs.next(newsList);
 
+                    let pipeRow = {
+                        "newspaper": crawler.newspaper, "newsCategory": crawler.newsCategory, "newsDivision": crawler.newsDivision,
+                        "startDate": crawler.startDate, "endDate": crawler.endDate,
+                        "percent": 100, "total": crawler.argList.length
+                    };
+
+                    if (rows.length == 0) {
+                        fileManager.updatePipe(crawler.sessionId, row, (path, exist) => {});
+                        crawlObs.complete();
+                        return;
+                    }
+
                     const minDate = rows[rows.length-1][2];
 
                     // 진행도
                     if (crawler.sessionId != null || crawler.sessionId != undefined) {
                         const percent = crawler.getDatePercentage(minDate);
-                        fileManager.updatePipe(crawler.sessionId, percent, crawler.argList.length, (path) => {});
+                        pipeRow.percent = percent;
+                        fileManager.updatePipe(crawler.sessionId, pipeRow, (path, exist) => {});
                     }
 
                     // 다음 페이지 크롤링
-                    if (minDate > crawler.startDate)
+                    if (minDate >= crawler.startDate)
                         crawler.crawling(page + 1, crawlObs);
                     else
                         crawlObs.complete();

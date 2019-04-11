@@ -65,17 +65,47 @@ class FileManager {
         });
     }
 
-    updatePipe(sessionId, percent, total, callback) {
+    updatePipe(sessionId, row, callback) {
         mkdirp(`${this.publicpath}/${this.ssepath}`, (err) => {
             const path = `${this.publicpath}/${this.ssepath}/${sessionId}-newscrawling.php`;
-            const text = `data: ${percent} ${total}\n\n`;
-            fs.writeFile(path, text, 'utf-8', (err1) => {
+            let exist = false;
+            fs.readFile(path, 'utf-8', (err1, data) => {
+                let rows = [];
+                let index = 0;
                 if (err1) {
-                    console.log(err1);
-                    callback(null);
+                    console.log('create new pipe ...');
                 } else {
-                    callback(path);
+                    rows = JSON.parse(data.split('data: ')[1]);
+                    for (let i = 0; i < rows.length; i++) {
+                        exist = row.newspaper == rows[i].newspaper
+                        && row.newsCategory == rows[i].newsCategory
+                        && row.newsDivision == rows[i].newsDivision
+                        && row.startDate == rows[i].startDate
+                        && row.endDate == rows[i].endDate;
+                        if (exist) {
+                            index = i;
+                            break;
+                        }
+                    }
                 }
+
+                if (rows.length == index) {
+                    rows.push(row);
+                } else {
+                    if (row.percent >= rows[index].percent)
+                        rows[index] = row;
+                }
+
+                const text = `data: ${JSON.stringify(rows)}\n\n`;
+
+                fs.writeFile(path, text, 'utf-8', (err2) => {
+                    if (err2) {
+                        console.log(err2);
+                        callback(null, null);
+                    } else {
+                        callback(path, exist);
+                    }
+                });
             });
         });
     }

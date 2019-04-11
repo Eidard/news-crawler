@@ -78,21 +78,23 @@ class HeraldCrawler extends Crawler {
     parsePage(body, page) {
         let $ = cheerio.load(body);
         let rows = [];
-        
+
         let s = 1, e = 15;
-        if (page === 1) {
+        if (page == 1) {
             s = 0, e = 14;
             let newsTitle = $('.fontTitle6 ').eq(1).text().trim();
             let newsUrl = 'http://www.koreaherald.com' + $('.fontTitle6 ').eq(1).attr("href");
             let newsDate = this.formatDate(newsUrl.substring(39, 47));
-            rows.push([newsTitle, newsUrl, newsDate]);
+            if (newsDate != null)
+                rows.push([newsTitle, newsUrl, newsDate]);
         }
 
         for (let i = s; i < e; i++) {
             let newsTitle = $('.fontTitle3 ').eq(i).text().trim();
             let newsUrl = 'http://www.koreaherald.com' + $('.fontTitle3 ').eq(i).attr("href");
             let newsDate = this.formatDate(newsUrl.substring(39, 47));
-            rows.push([newsTitle, newsUrl, newsDate]);
+            if (newsDate != null)
+                rows.push([newsTitle, newsUrl, newsDate]);
         }
 
         return rows;
@@ -106,9 +108,13 @@ class HeraldCrawler extends Crawler {
     }
     
     formatDate(date) {
+        if (date == '') return null;
         let year = date.substring(0, 4);
         let month = date.substring(4, 6);
         let day = date.substring(6, 8);
+        if (year == '' || month == '' || day == '')
+            return null;
+
         return `${year}-${month}-${day}`;
     }
 }

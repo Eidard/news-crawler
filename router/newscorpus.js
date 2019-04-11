@@ -56,10 +56,17 @@ function getNewsCount(query, startDate, endDate, reqCallback) {
 
     const dbQueryCallback = function (connection, rows) {
         database.disconnect(connection, function () { });
-        if (rows.length >= 0)
+
+        if (rows.length >= 0) {
+            let keys = Object.keys(rows[0]);
+            keys.forEach(key => {
+                if (rows[0][key] == null)
+                    rows[0][key] = 0;
+            });
             reqCallback(0, rows[0]);
-        else
+        } else {
             reqCallback(1, null);
+        }
     }
 
     /* execute */
