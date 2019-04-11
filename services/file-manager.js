@@ -76,12 +76,13 @@ class FileManager {
                     console.log('create new pipe ...');
                 } else {
                     rows = JSON.parse(data.split('data: ')[1]);
+                    index = rows.length;
                     for (let i = 0; i < rows.length; i++) {
                         exist = row.newspaper == rows[i].newspaper
-                        && row.newsCategory == rows[i].newsCategory
-                        && row.newsDivision == rows[i].newsDivision
-                        && row.startDate == rows[i].startDate
-                        && row.endDate == rows[i].endDate;
+                            && row.newsCategory == rows[i].newsCategory
+                            && row.newsDivision == rows[i].newsDivision
+                            && row.startDate == rows[i].startDate
+                            && row.endDate == rows[i].endDate;
                         if (exist) {
                             index = i;
                             break;
