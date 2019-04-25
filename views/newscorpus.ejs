@@ -19,7 +19,7 @@
 
 	<!-- tool buttons (back, filter, download) -->
 	<div class="btn-group" style="padding: 10px 10px 0px 10px; width: 100%">
-		<button type="button" class="btn btn-outline-dark" onclick="back()"><i class="fas fa-arrow-left"></i></button>
+		<button type="button" class="btn btn-outline-dark" onclick="movePrevPath()"><i class="fas fa-arrow-left"></i></button>
 		<button type="button" class="btn btn-outline-dark" onclick="moveLastNextPath()"><i class="fas fa-arrow-right"></i></button>
 		<button type="button" class="btn btn-outline-dark" data-toggle="modal" data-target="#filterModal"><i class="fas fa-calendar-alt"></i></button>
 		<button type="button" class="btn btn-outline-dark" onclick="downloadContent()"><i class="fas fa-download"></i></button>
@@ -33,7 +33,7 @@
 			<div class="form-inline">
 				<input class="form-control mr-sm-2" id="startDate" type="date" value="">
 				<input class="form-control mr-sm-2" id="endDate" type="date" value="">
-				<button type="button" class="btn" onclick="clearFilter()"><i class="fas fa-eraser"></i></button>			
+				<button type="button" class="btn" onclick="clearDateFilter()"><i class="fas fa-eraser"></i></button>			
 			</div>
 		</div>
 		<div class="text-center" style="padding: 0px 0px 20px 0px">
@@ -90,25 +90,12 @@
 	</div>
 
 	<!-- folders -->
-	<div class="container-fluid" id="divMain" style="padding: 20px; height: 762px; overflow: auto">
+	<div class="container-fluid" id="divMain" style="padding: 20px; height: 524px; overflow: auto">
 	</div>
 
-	<!-- root's total table -->
-	<div class="container" style="margin: 10px 0px; position: absolute; top: 650px; overflow-x: auto">
-		<table class="table table-striped" id="rootNewsTotal" style="display: none">
-			<tr class="table-primary">
-				<th>신문사</th><th>뉴스개수</th><th>파일크기</th><th>단어수</th><th>문장수</th>
-			</tr>
-			<tr id="rootNewsTotal_herald">
-				<td>herald</td><td>0개</td><td>0 KB</td><td>0 개</td><td>0 개</td>
-			</tr>
-			<tr id="rootNewsTotal_joongang">
-				<td>joongang</td><td>0개</td><td>0 KB</td><td>0 개</td><td>0 개</td>
-			</tr>
-			<tr id="rootNewsTotal_reuters">
-				<td>reuters</td><td>0개</td><td>0 KB</td><td>0 개</td><td>0 개</td>
-			</tr>
-		</table>
+	<!-- news total table -->
+	<div class="container" style="margin: 10px 0px; overflow-x: auto">
+		<table class="table table-striped" id="tbNewsTotal" style="display: none"></table>
 	</div>
 
 	<footer><% include commons/footer.ejs %></footer>
@@ -127,6 +114,7 @@
 		const btnCloseContent = document.getElementById("close_content");
 		const divTitle = document.getElementById("title");
 		const divContent = document.getElementById("content");
+		const tbNewsTotal = document.getElementById("tbNewsTotal");
 		//-news list
 		const newsTable = document.getElementById("newsTable");
 		//-folder
@@ -136,71 +124,47 @@
 		/* Data */
 		const ROOT_PATH = 'NEWS';
 		let currentPath = ROOT_PATH;
-		let newsArgs = {"newsName": "", "newsCategory": "", "newsDivision": ""}; //현재 경로 내용
 		let lastNextName = []; //앞으로 갈 때 이동할 필터명
 		let selectedItems = []; //선택된 폴더 OR 뉴스 (다운로드 리스트)
+		let newsArgs = {"newsName": "", "newsCategory": "", "newsDivision": ""}; //현재 경로 내용
 
 		/* execute */
 		document.getElementById("nav-corpus").classList.add('active');
 		pathbox.value = currentPath;
+		initNewsTotalTable(true);
 		showFolders();
 
 		/* View Control */
-		function back() {
-			newsTable.style.display = 'none';
-			movePrevPath();
-			showFolders();
-		}
-
-		function clearFilter() {
+		function clearDateFilter() {
 			inputform_startDate.value = "";
 			inputform_endDate.value = "";
 		}
 
-		function showhideRightSideBox(shown) {
+		function showhideRightSideBox(shown) { //뉴스 내용 창을 보여주거나 숨긴다.
 			document.getElementById("divArticle").style.width = (shown) ? '80%' : '0';
 		}
 
-		function showFolders() {
+		function showFolders() { //하위 폴더를 보여준다. (성공 true, 실패 false -> 실패한 경우 Caller는 폴더 대신 뉴스기사 목록을 보여줘야 한다.)
 			let svgHtml = '';
-			let list = null;
-			newsArgs = {"newsName": "", "newsCategory": "", "newsDivision": ""};
-			selectedItems.length = 0; //clear list
 
-			if (currentPath == ROOT_PATH) {
-				list = Object.keys(newsNames);
-			} else {
-				const pathNames = currentPath.split('/');
-				if (pathNames.length == 2) { //category
-					list = categories[pathNames[1]];
-					newsArgs['newsName'] = pathNames[1];
-				} else if (pathNames.length == 3) { //division
-					list = divisions[pathNames[1]][pathNames[2]];
-					newsArgs['newsName'] = pathNames[1];
-					newsArgs['newsCategory'] = pathNames[2];
-				} else {
-					newsArgs['newsName'] = pathNames[1];
-					newsArgs['newsCategory'] = pathNames[2];
-					newsArgs['newsDivision'] = pathNames[3];
-				}
+			selectedItems.length = 0; //선택 목록 초기화 (clear list)
+			let sublistNames = getSubListNames();
+			if (!sublistNames || sublistNames.length == 0) {
+				return false;
 			}
 
-			if (!list || list.length == 0) {
-				loadNewsList(1);
-				return;
-			}
-
-			list.forEach(val => {
-				const firstLetter = val[0].toUpperCase();
+			// 폴더 그리기
+			sublistNames.forEach(name => {
+				const firstLetter = name[0].toUpperCase();
 				svgHtml += `
-<button class="btn folder" onclick="selectItem(this, '${val}')" ondblclick="moveNextPath('${val}')">
-	<svg height="100" width="100">
-		<polygon points="0,0 40,0 50,10 100,10 100,100 0,100" fill="antiquewhite" />
-		<text x="50" y="85" font-size="90" fill="coral" text-anchor="middle">${firstLetter}</text>
+<button class="btn folder" onclick="selectItem(this, '${name}')" ondblclick="moveNextPath('${name}')">
+	<svg height="50" width="50">
+		<polygon points="0,0 20,0 25,5 50,5 50,50 0,50" fill="antiquewhite" />
+		<text x="25" y="42" font-size="45" fill="coral" text-anchor="middle">${firstLetter}</text>
 	</svg>
-	<div class="folder-name" id="folder_${val}">
-		${val}
-		<span class="spinner-border spinner-border-sm" id="spinner_${val}"></span>
+	<div class="folder-name" id="folder_${name}">
+		${name}
+		<span class="spinner-border spinner-border-sm" id="spinner_${name}"></span>
 	</div>
 </button>
 				`;
@@ -208,7 +172,9 @@
 			divMain.style.display = 'block';
 			divMain.innerHTML = svgHtml;
 
-			loadFolders(list); //각 폴더이름 옆에 기사개수 로드
+			loadFolders(sublistNames); //각 폴더이름 옆에 기사개수 로드
+
+			return true;
 		}
 
 		function selectItem(v, name) {
@@ -230,11 +196,13 @@
 
 		function movePrevPath() {
 			if (currentPath == ROOT_PATH) return;
+			newsTable.style.display = 'none';
 			const lastSlashIdx = currentPath.lastIndexOf('/');
 			lastNextName.push(currentPath.substr(lastSlashIdx + 1, currentPath.length - lastSlashIdx - 1));
 			currentPath = currentPath.substr(0, lastSlashIdx);
 			pathbox.value = currentPath;
-			showFolders();
+			if (!showFolders())
+				loadNewsList(1);
 		}
 
 		function moveNextPath(name) {
@@ -244,12 +212,46 @@
 				name = lastNextName.pop();
 			currentPath += ('/' + name);
 			pathbox.value = currentPath;
-			showFolders();
+			if (!showFolders())
+				loadNewsList(1);
 		}
 
 		function moveLastNextPath() {
 			if (lastNextName.length > 0)
 				moveNextPath();
+		}
+
+		function getSubListNames() { //현재 경로의 하위 목록을 반환한다.
+			newsArgs = {"newsName": "", "newsCategory": "", "newsDivision": ""};
+
+			let sublist = null;
+			if (currentPath == ROOT_PATH) {
+				sublist = Object.keys(newsNames);
+			} else {
+				const pathNames = currentPath.split('/');
+				if (pathNames.length == 2) { //category
+					sublist = categories[pathNames[1]];
+					newsArgs['newsName'] = pathNames[1];
+				} else if (pathNames.length == 3) { //division
+					sublist = divisions[pathNames[1]][pathNames[2]];
+					newsArgs['newsName'] = pathNames[1];
+					newsArgs['newsCategory'] = pathNames[2];
+				} else {
+					newsArgs['newsName'] = pathNames[1];
+					newsArgs['newsCategory'] = pathNames[2];
+					newsArgs['newsDivision'] = pathNames[3];
+				}
+			}
+
+			return sublist;
+		}
+
+		function initNewsTotalTable(show) {
+			tbNewsTotal.innerHTML = `
+				<tr class="table-primary">
+					<th>신문사/분류</th><th>뉴스개수</th><th>파일크기</th><th>단어수</th><th>문장수</th>
+				</tr>`;
+			tbNewsTotal.style.display = show ? 'block' : 'none';
 		}
 
 		/* Http Server */
@@ -260,7 +262,6 @@
 
 			let suffix = "";
 			let suffixKey = "";
-			let isRoot = false;
 			if (newsName != "") {
 				suffix += `?newsName=${newsName}`;
 				if (newsCategory != "") {
@@ -275,10 +276,9 @@
 				}
 			} else {
 				suffixKey = "?newsName=";
-				isRoot = true;
 			}
 
-			document.getElementById('rootNewsTotal').style.display = isRoot ? 'block' : 'none';
+			initNewsTotalTable(true);
 
 			folderList.forEach(val => {
 				let dest = `newscorpus/count${suffix}${suffixKey}${val}`;
@@ -295,14 +295,25 @@
 					let divFolder = document.getElementById(`folder_${val}`);
 					divFolder.innerText = `${val} (${count})`;
 
-					if (isRoot) {
-						let tr = document.getElementById(`rootNewsTotal_${val}`);
-						let tds = tr.getElementsByTagName('td');
-						tds[1].innerText = numberWithCommas(count) + " 개";
-						tds[2].innerText = numberWithCommas(Math.round(result.fs / 1024 * 10) / 10) + " KB";
-						tds[3].innerText = numberWithCommas(result.wc) + " 개";
-						tds[4].innerText = numberWithCommas(result.sc) + " 개";
-					}
+					let tr = document.createElement("TR");
+					let tdName = document.createElement("TD");
+					let tdNewsCount = document.createElement("TD");
+					let tdFileSize = document.createElement("TD");
+					let tdWordCount = document.createElement("TD");
+					let tdSentenceCount = document.createElement("TD");
+
+					tdName.innerText = val;
+					tdNewsCount.innerText = numberWithCommas(count) + " 개";
+					tdFileSize.innerText = numberWithCommas(Math.round(result.fs / 1024 * 10) / 10) + " KB";
+					tdWordCount.innerText = numberWithCommas(result.wc) + " 개";
+					tdSentenceCount.innerText = numberWithCommas(result.sc) + " 개";
+
+					tr.appendChild(tdName);
+					tr.appendChild(tdNewsCount);
+					tr.appendChild(tdFileSize);
+					tr.appendChild(tdWordCount);
+					tr.appendChild(tdSentenceCount);
+					tbNewsTotal.appendChild(tr);
 				});
 			});
 		}
@@ -310,6 +321,7 @@
 		function loadNewsList(page) { //페이지의 뉴스 목록을 가져온다.
 			divMain.style.display = 'none';
 			newsTable.style.display = 'block';
+			initNewsTotalTable(false);
 
 			if (page < 1) page = 1;
 			const size = 10; //행 최대개수
@@ -320,7 +332,7 @@
 			startDate = inputform_startDate.value;
 			endDate = inputform_endDate.value;
 
-			/* Get news count */
+			/* Load news count */
 			let dest = `newscorpus/count?newsName=${newsName}&newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
 			connect("GET", dest, null, null, function(readyState, status, response) {
 				if (readyState != 4 || status != 200) return;
@@ -363,12 +375,12 @@
 					btnGroup.appendChild(btn);
 				}
 
-				/* Get news list */
+				/* Load news list */
 				const table = document.getElementById("list");
 				//id  url  newspaper  category  division  date  title text
 				while (table.childElementCount > 1)
 					table.removeChild(table.lastChild);
-				
+
 				if (count == 0) {
 					document.getElementById("noData").style.display = 'block';
 					return;
@@ -443,8 +455,8 @@
 						tr.appendChild(tdTxt);
 						table.appendChild(tr);
 					}
-				}); //get news list
-			}); //get news count
+				}); //load news list
+			}); //load news count
 		}
 
 		function loadContent(title, texturl) { //뉴스 내용을 가져온다.
@@ -462,7 +474,7 @@
 				});
 		}
 
-		function closeContent() {
+		function closeContent() { //뉴스 내용 창을 닫는다.
 			showhideRightSideBox(false);
 			btnCloseContent.style.display = 'none';
 			while (divTitle.firstChild)
