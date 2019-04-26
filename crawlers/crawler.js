@@ -162,7 +162,7 @@ class Crawler {
                     };
 
                     if (rows.length == 0) {
-                        fileManager.updatePipe(crawler.sessionId, row, (path, exist) => {});
+                        fileManager.updatePipe(crawler.sessionId, pipeRow, (path, exist) => {});
                         crawlObs.complete();
                         return;
                     }
