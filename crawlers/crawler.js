@@ -125,8 +125,17 @@ class Crawler {
                                 let filename = `${newsDate}-${newsTitle}.txt`;
                                 let newsText = crawler.makeLinesEndsWithClose(crawler.parseNewsText(body));
                                 let textsize = Buffer.from(newsText).length;
-                                let textwc = newsText.match(/\w+/g).length;
-                                let textsc = newsText.match(/^.\w*/gm).length;
+                                
+                                let textwc = 0;
+                                let textsc = 0;
+
+                                let tmp = newsText.match(/\w+/g);
+                                if (tmp != null)
+                                    textwc = tmp.length;
+                                tmp = newsText.match(/^.\w*/gm).length;
+                                if (tmp != null)
+                                    textsc = tmp.length;
+
                                 fileManager.putText(dirname, filename, newsText, (texturl) => {
                                     if (texturl == null) {
                                         console.log(`fail to upload text file '${filename}'`);
