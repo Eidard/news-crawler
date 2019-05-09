@@ -140,8 +140,8 @@ class Crawler {
                                     if (texturl == null) {
                                         console.log(`fail to upload text file '${filename}'`);
                                         // TODO: uncomment below after create S3 bucket
-                                        // handleReqError();
-                                        // return;
+                                        handleReqError();
+                                        return;
                                     }
                                     let news = [newsUrl, crawler.newspaper, crawler.newsCategory, crawler.newsDivision, newsDate, newsTitle, texturl, textsize, textwc, textsc];
                                     reqObs.next(news);
