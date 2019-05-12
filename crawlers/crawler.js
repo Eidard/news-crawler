@@ -132,7 +132,7 @@ class Crawler {
                                 let tmp = newsText.match(/\w+/g);
                                 if (tmp != null)
                                     textwc = tmp.length;
-                                tmp = newsText.match(/^.\w*/gm).length;
+                                tmp = newsText.match(/^.\w*/gm);
                                 if (tmp != null)
                                     textsc = tmp.length;
 

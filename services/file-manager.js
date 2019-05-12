@@ -75,7 +75,13 @@ class FileManager {
                 if (err1) {
                     console.log('create new pipe ...');
                 } else {
-                    rows = JSON.parse(data.split('data: ')[1]);
+                    try {
+                        rows = JSON.parse(data.split('data: ')[1]);
+                    } catch(err) {
+                        console.log('fail to parsing json. updating pipe is aborted.');
+                        callback(null, null);
+                        return;
+                    }
                     index = rows.length;
                     for (let i = 0; i < rows.length; i++) {
                         exist = row.newspaper == rows[i].newspaper
