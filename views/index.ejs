@@ -10,12 +10,24 @@
 		<a href='/' style="color: black; text-decoration: none"><h1>Web NLP Tools</h1></a>
 	</div>
 
-	<div class="jumbotron" style="padding: 50px; margin: 180px 5px 300px 5px">
-		<button type="button" class="btn btn-primary btn-lg btn-block" onclick="go_page('/newscrawling')">뉴스 크롤링</button>
-		
-		<button type="button" class="btn btn-primary btn-lg btn-block" onclick="go_page('/newscorpus')">말뭉치 확인</button>
+	<div style="height: 100px"></div>
+
+	<div class="row">
+		<div class="jumbotron col-sm-5 center" style="height: 200px; padding: 10px 10px 10px 10px">
+			<h5 class="center" style="height: 50px; text-align: center">크롤링</h5>
+			<button type="button" class="btn btn-primary btn-lg btn-block" onclick="go_page('/newscrawling')">뉴스 크롤링</button>
+			<button type="button" class="btn btn-primary btn-lg btn-block" onclick="go_page('/doccrawling')">DOC 크롤링</button>
+		</div>
+
+		<div class="jumbotron col-sm-5 center" style="height: 200px; padding: 10px">
+			<h5 class="center" style="height: 50px; text-align: center">수집 결과</h5>
+			<button type="button" class="btn btn-primary btn-lg btn-block" onclick="go_page('/newscorpus')">뉴스 말뭉치 확인</button>
+			<button type="button" class="btn btn-primary btn-lg btn-block" onclick="go_page('/doccorpus')">DOC 말뭉치 확인</button>
+		</div>
 	</div>
 
+	<div style="height: 300px"></div>
+	
 	<footer><% include commons/footer.ejs %></footer>
 
 	<!-- top button -->

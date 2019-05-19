@@ -65,3 +65,10 @@ span.link {
     height: 20px;
     text-align: center;
 }
+
+
+/* utils */
+.center {
+    margin: auto;
+    width: 50%;
+}

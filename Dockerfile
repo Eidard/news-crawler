@@ -18,5 +18,6 @@ EXPOSE 50000
 CMD npm start
 
 # HOW TO use Dockerfile
-# docker build -t news-crawler
-# docker run -d -p {prefer_port}:50000 news-crawler
+# Edit private/config.json, private/credentials.json files (See README.md)
+# $ docker build -t news-crawler
+# $ docker run -d -p {prefer_port}:50000 news-crawler

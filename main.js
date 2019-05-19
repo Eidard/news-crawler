@@ -32,6 +32,7 @@ app.use(session({
 const main_router = require('./router/main') (app);
 const newscrawling_router = require('./router/newscrawling') (app);
 const newscorpus_router = require('./router/newscorpus') (app);
+const doccorpus_router = require('./router/doccorpus') (app);
 
 // 서버 실행
 const config = JSON.parse(fs.readFileSync(__dirname + '/private/config.json')).server;

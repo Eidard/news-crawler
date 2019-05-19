@@ -116,7 +116,7 @@ function getZipFile(query, startDate, endDate, key, selectedItems, sessionID, re
 
     const dbQueryCallback = function (connection, rows) {
         database.disconnect(connection, function () { });
-        if (rows.length < 1)
+        if (rows.length < 1 || rows.length > 10000)
             reqCallback(1, null);
 
         let obsList = [];
@@ -246,13 +246,13 @@ module.exports = function (app) {
         startDate = req.query.startDate;
         endDate = req.query.endDate;
 
-        array = {
+        mapper = {
             'newsName': 'newspaper',
             'newsCategory': 'category',
             'newsDivision': 'division',
             'newsId': 'id'
         }
-        key = array[req.body.key];
+        key = mapper[req.body.key];
         selectedItems = req.body.selectedItems;
         if (selectedItems == undefined || selectedItems.length == 0) {
             res.status(203).send().end();

@@ -2,10 +2,13 @@
 const fs = require('fs');
 const mysql = require('mysql'); //mysql DB 접근
 
+let instance;
 
 class Database {
-
     constructor() {
+        if (instance) return instance;
+        instance = this;
+
         const config = JSON.parse(fs.readFileSync(__dirname + '/../private/config.json')).db;
 
         this.pool = mysql.createPool({

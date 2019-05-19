@@ -1,28 +1,26 @@
 /* AWS S3 */
 const AWS = require('aws-sdk');
-const formidable = require('formidable');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
 
-class FileManager {
+let instance;
 
+class FileManager {
     constructor() {
-        const config = JSON.parse(fs.readFileSync(__dirname + '/../private/config.json')).s3;
+        if (instance) return instance;
+        instance = this;
+
+        const bucket = JSON.parse(fs.readFileSync(__dirname + '/../private/config.json')).s3.news;
         AWS.config.loadFromPath(__dirname + '/../private/credentials.json');
 
         this.s3 = new AWS.S3();
         this.params = {
-            Bucket: config.Bucket,
+            Bucket: bucket,
             Key: null,
             ACL: 'public-read',
             Body: null
         };
-        this.form = new formidable.IncomingForm({
-            encoding: 'utf-8',
-            multiples: true,
-            keepExtensions: false
-        });
         this.publicpath = './public';
         this.txtpath = 'newsText';
         this.ssepath = 'sse';

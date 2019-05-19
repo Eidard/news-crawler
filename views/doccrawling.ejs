@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head><% include commons/head.ejs %></head>
+
+<body>
+
+	<header><% include commons/header.ejs %></header>
+
+	<!-- input form -->
+	<form action="https://ny1ki56kuh.execute-api.ap-northeast-2.amazonaws.com/dev/docs" method="post" class="jumbotron" style="padding: 20px 60px 20px 60px">
+		<label for="cloud"><h5>Select Cloud</h5></label>
+		<div class="form-inline">
+			<select class="form-control mr-sm-2" id="cloud" name="cloud">
+                <option value="aws">AWS</option>
+                <option value="azure">Azure</option>
+                <option value="azureBlog">Azure Blog</option>
+                <option value="googleCloud">Google Cloud</option>
+			</select>
+		</div>
+		<br>
+		<label for="url"><h5>URL</h5></label>
+		<div class="form-group">
+			<input type="text" class="form-control mr-sm-2" id="url" name="url" value="">
+		</div>
+		<div class="container-fluid text-center" style="margin: 20px 0px 0px 0px">
+			<button type="submit" class="btn btn-primary">
+				Submit
+			</button>
+		</div>
+    </form>
+
+    <div style="height: 500px"></div>
+
+	<footer><% include commons/footer.ejs %></footer>
+
+	<!-- top button -->
+	<% include commons/floatingbutton.ejs %>
+
+
+	<!-- script -->
+	<script type="text/javascript">
+		document.getElementById("nav-doccrawling").classList.add('active');
+	</script>
+
+</body>
+</html>

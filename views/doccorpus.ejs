@@ -6,7 +6,7 @@
 
 	<header><% include commons/header.ejs %></header>
 
-	<!-- news article content -->
+	<!-- doc article content -->
 	<div class="rounded right-sidebox" id="divArticle" style="z-index: 9">
 		<div class="text-right" id="close_content" style="display: none">
 			<div onclick="closeContent()" style="display: inline; color: darkgrey; padding: 0px 10px 0px 0px; margin: 10px; text-decoration: underline; cursor: pointer">
@@ -17,75 +17,61 @@
 		<div class="container-fluid readability" id="content" style="padding: 10px 20px 20px 20px; margin: 10px 10px 10px 10px"></div>
 	</div>
 
-	<!-- tool buttons (back, filter, download) -->
+	<!-- tool buttons (back, download) -->
 	<div class="btn-group" style="padding: 10px 10px 0px 10px; width: 100%">
 		<button type="button" class="btn btn-outline-dark" onclick="movePrevPath()"><i class="fas fa-arrow-left"></i></button>
 		<button type="button" class="btn btn-outline-dark" onclick="moveLastNextPath()"><i class="fas fa-arrow-right"></i></button>
-		<button type="button" class="btn btn-outline-dark" data-toggle="modal" data-target="#filterModal"><i class="fas fa-calendar-alt"></i></button>
 		<button type="button" class="btn btn-outline-dark" onclick="downloadContent()"><i class="fas fa-download"></i></button>
 		<input class="rounded-right pathbox" id="pathbox" readonly style="padding-left: 10px; width: 100%; height: 40px">
 	</div>
 
-	<!-- filter modal -->
-	<div class="modal fade" id="filterModal"><div class="modal-dialog"><div class="modal-content">
-		<div class="modal-body jumbotron" style="margin: 10px">
-			<label for="startDate"><h5>기간</h5></label>
-			<div class="form-inline">
-				<input class="form-control mr-sm-2" id="startDate" type="date" value="">
-				<input class="form-control mr-sm-2" id="endDate" type="date" value="">
-				<button type="button" class="btn" onclick="clearDateFilter()"><i class="fas fa-eraser"></i></button>			
-			</div>
-		</div>
-		<div class="text-center" style="padding: 0px 0px 20px 0px">
-			<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="loadNewsList(1)"><i class="fas fa-check"></i>&nbsp;&nbsp;확인</button>
-			<button type="button" class="btn btn-outline-primary" data-dismiss="modal"><i class="fas fa-times"></i>&nbsp;&nbsp;취소</button>
-		</div>
-	</div></div></div>
-
 	<!-- table container -->
-	<div class="container-fluid" id="newsTable" style="display: none; margin: 10px 0px; height: 742px">
+	<div class="container-fluid" id="docTable" style="display: none; margin: 10px 0px; height: 742px">
 		<!-- total -->
 		<form class="form-inline">
 			<div class="input-group my-1 mr-1">
 				<div class="input-group-prepend">
 					<span class="input-group-text">총 개수</label>
 				</div>
-				<span class="form-control" id="newsTotal">0</span>
+				<span class="form-control" id="docTotal">0</span>
 			</div>
 			<div class="input-group my-1 mr-1">
 				<div class="input-group-prepend">
 					<span class="input-group-text">파일크기</label>
 				</div>
-				<span class="form-control" id="newsFileSize">0</span>
+				<span class="form-control" id="docFileSize">0</span>
 			</div>
+
+<!-- TODO: 요금문제 고려
 			<div class="input-group my-1 mr-1">
 				<div class="input-group-prepend">
 					<span class="input-group-text">단어 수</label>
 				</div>
-				<span class="form-control" id="newsWordCount">0</span>
+				<span class="form-control" id="docWordCount">0</span>
 			</div>
 			<div class="input-group my-1">
 				<div class="input-group-prepend">
 					<span class="input-group-text">문장 수</label>
 				</div>
-				<span class="form-control" id="newsSentenceCount">0</span>
+				<span class="form-control" id="docSentenceCount">0</span>
 			</div>
+-->
 		</form>
 		
 		<!-- table -->
 		<div style="overflow-x: auto">
 			<table class="table table-striped" id="list">
 				<tr class="table-primary">
-					<th>id</th><th>제목</th><th>신문사</th><th>상위 분류</th><th>하위 분류</th><th>날짜</th><th>파일크기</th><th>단어수</th><th>문장수</th><th>파일저장</th>
+					<th>제목</th><th>클라우드</th><th>파일크기</th><th>단어수</th><th>문장수</th><th>파일저장</th>
 				</tr>
 			</table>
 			<div class="container-fluid text-center" id="noData" style="display: none; font-size: 24px; color: darkgray; padding: 10px 20px 20px 20px">
 				No Data ...
 			</div>
 		</div>
-		<span class="link" onclick="loadNewsList(1)">첫 페이지</span>
-		<!-- '마지막 페이지' 링크는 loadNewsList(...)에서 다시 onclick 콜백함수가 설정된다. -->
-		<span class="link" id="go_last_page" onclick="loadNewsList(1)" style="padding: 5px">마지막 페이지</span>
+		<span class="link" onclick="loadDocList(1)">첫 페이지</span>
+		<!-- '마지막 페이지' 링크는 loadDocList(...)에서 다시 onclick 콜백함수가 설정된다. -->
+		<span class="link" id="go_last_page" onclick="loadDocList(1)" style="padding: 5px">마지막 페이지</span>
 		<div class="btn-group text-center" id="page" style="display: block; padding: 0px 20px 20px 20px"></div>
 	</div>
 
@@ -93,9 +79,9 @@
 	<div class="container-fluid" id="divMain" style="padding: 20px; height: 524px; overflow: auto">
 	</div>
 
-	<!-- news total table -->
+	<!-- doc total table -->
 	<div class="container" style="margin: 10px 0px; overflow-x: auto">
-		<table class="table table-striped" id="tbNewsTotal" style="display: none"></table>
+		<table class="table table-striped" id="tbDocTotal" style="display: none"></table>
 	</div>
 
 	<footer><% include commons/footer.ejs %></footer>
@@ -105,7 +91,6 @@
 
 
 	<!-- == SCRIPTs ===================================================================== -->
-	<% include news/inputform.ejs %> <!-- news filter -->
 	<% include commons/util.ejs %> <!-- connection util -->
 
 	<script type="text/javascript">
@@ -114,33 +99,31 @@
 		const btnCloseContent = document.getElementById("close_content");
 		const divTitle = document.getElementById("title");
 		const divContent = document.getElementById("content");
-		const tbNewsTotal = document.getElementById("tbNewsTotal");
-		//-news list
-		const newsTable = document.getElementById("newsTable");
+		const tbDocTotal = document.getElementById("tbDocTotal");
+		//-doc list
+		const docTable = document.getElementById("docTable");
 		//-folder
 		const pathbox = document.getElementById("pathbox");
 		const divMain = document.getElementById("divMain");
-
+		
 		/* Data */
-		const ROOT_PATH = 'NEWS';
+		const ROOT_PATH = 'DOC';
 		let currentPath = ROOT_PATH;
 		let lastNextName = []; //앞으로 갈 때 이동할 필터명
-		let selectedItems = []; //선택된 폴더 OR 뉴스 (다운로드 리스트)
-		let newsArgs = {"newsName": "", "newsCategory": "", "newsDivision": ""}; //현재 경로 내용
-
+		let selectedItems = []; //선택된 폴더 OR S3객체키 (다운로드 리스트)
+		let cloudNames = ["aws", "azure", "azureBlog", "googleCloud"];
+		let docArgs = {"cloud": ""}; //현재 경로 내용
+		let count = 0;
+		let startKeys = []; //AWS S3 페이징을 위한 S3객체키 (0-based)
+		
 		/* execute */
-		document.getElementById("nav-newscorpus").classList.add('active');
+		document.getElementById("nav-doccorpus").classList.add('active');
 		pathbox.value = currentPath;
-		initNewsTotalTable(true);
+		initDocTotalTable(true);
 		showFolders();
 
 		/* View Control */
-		function clearDateFilter() {
-			inputform_startDate.value = "";
-			inputform_endDate.value = "";
-		}
-
-		function showhideRightSideBox(shown) { //뉴스 내용 창을 보여주거나 숨긴다.
+		function showhideRightSideBox(shown) { //내용 창을 보여주거나 숨긴다.
 			document.getElementById("divArticle").style.width = (shown) ? '80%' : '0';
 		}
 
@@ -196,13 +179,13 @@
 
 		function movePrevPath() {
 			if (currentPath == ROOT_PATH) return;
-			newsTable.style.display = 'none';
+			docTable.style.display = 'none';
 			const lastSlashIdx = currentPath.lastIndexOf('/');
 			lastNextName.push(currentPath.substr(lastSlashIdx + 1, currentPath.length - lastSlashIdx - 1));
 			currentPath = currentPath.substr(0, lastSlashIdx);
 			pathbox.value = currentPath;
 			if (!showFolders())
-				loadNewsList(1);
+				loadDocList(1);
 		}
 
 		function moveNextPath(name) {
@@ -213,7 +196,7 @@
 			currentPath += ('/' + name);
 			pathbox.value = currentPath;
 			if (!showFolders())
-				loadNewsList(1);
+				loadDocList(1);
 		}
 
 		function moveLastNextPath() {
@@ -222,66 +205,45 @@
 		}
 
 		function getSubListNames() { //현재 경로의 하위 목록을 반환한다.
-			newsArgs = {"newsName": "", "newsCategory": "", "newsDivision": ""};
+			docArgs = {"cloud": ""};
 
 			let sublist = null;
 			if (currentPath == ROOT_PATH) {
-				sublist = Object.keys(newsNames);
+				sublist = cloudNames;
 			} else {
 				const pathNames = currentPath.split('/');
-				if (pathNames.length == 2) { //category
-					sublist = categories[pathNames[1]];
-					newsArgs['newsName'] = pathNames[1];
-				} else if (pathNames.length == 3) { //division
-					sublist = divisions[pathNames[1]][pathNames[2]];
-					newsArgs['newsName'] = pathNames[1];
-					newsArgs['newsCategory'] = pathNames[2];
-				} else {
-					newsArgs['newsName'] = pathNames[1];
-					newsArgs['newsCategory'] = pathNames[2];
-					newsArgs['newsDivision'] = pathNames[3];
+				if (pathNames.length == 2) { //not Root
+					docArgs['cloud'] = pathNames[1];
 				}
 			}
 
 			return sublist;
 		}
 
-		function initNewsTotalTable(show) {
-			tbNewsTotal.innerHTML = `
+		function initDocTotalTable(show) {
+			tbDocTotal.innerHTML = `
 				<tr class="table-primary">
-					<th>신문사/분류</th><th>뉴스개수</th><th>파일크기</th><th>단어수</th><th>문장수</th>
+					<th>클라우드</th><th>개수</th><th>파일크기</th><th>단어수</th><th>문장수</th>
 				</tr>`;
-			tbNewsTotal.style.display = show ? 'block' : 'none';
+			tbDocTotal.style.display = show ? 'block' : 'none';
 		}
 
 		/* Http Server */
-		function loadFolders(folderList) { //각 폴더이름 옆에 기사개수 로드
-			let newsName = newsArgs["newsName"];
-			let newsCategory = newsArgs["newsCategory"];
-			let newsDivision = newsArgs["newsDivision"];
+		function loadFolders(folderList) { //각 폴더이름 옆에 개수 로드
+			let cloud = docArgs["cloud"];
 
 			let suffix = "";
 			let suffixKey = "";
-			if (newsName != "") {
-				suffix += `?newsName=${newsName}`;
-				if (newsCategory != "") {
-					suffix += `&newsCategory=${newsCategory}`;
-					if (newsDivision != "") {
-						suffix += `&newsDivision=${newsDivision}`;
-					} else {
-						suffixKey = "&newsDivision=";
-					}
-				} else {
-					suffixKey = "&newsCategory=";
-				}
+			if (cloud != "") {
+				suffix += `?cloud=${cloud}`;
 			} else {
-				suffixKey = "?newsName=";
+				suffixKey = "?cloud=";
 			}
 
-			initNewsTotalTable(true);
+			initDocTotalTable(true);
 
 			folderList.forEach(val => {
-				let dest = `newscorpus/count${suffix}${suffixKey}${val}`;
+				let dest = `doccorpus/count${suffix}${suffixKey}${val}`;
 				connect("GET", dest, null, null, function(readyState, status, response) {
 					if (readyState != 4) return;
 					let spinner = document.getElementById(`spinner_${val}`);
@@ -297,60 +259,45 @@
 
 					let tr = document.createElement("TR");
 					let tdName = document.createElement("TD");
-					let tdNewsCount = document.createElement("TD");
+					let tdDocCount = document.createElement("TD");
 					let tdFileSize = document.createElement("TD");
 					let tdWordCount = document.createElement("TD");
 					let tdSentenceCount = document.createElement("TD");
 
 					tdName.innerText = val;
-					tdNewsCount.innerText = numberWithCommas(count) + " 개";
-					tdFileSize.innerText = numberWithCommas(Math.round(result.fs / 1024 * 10) / 10) + " KB";
-					tdWordCount.innerText = numberWithCommas(result.wc) + " 개";
-					tdSentenceCount.innerText = numberWithCommas(result.sc) + " 개";
+					tdDocCount.innerText = numberWithCommas(count) + " 개";
+					// tdFileSize.innerText = numberWithCommas(Math.round(result.fs / 1024 * 10) / 10) + " KB";
+					// tdWordCount.innerText = numberWithCommas(result.wc) + " 개";
+					// tdSentenceCount.innerText = numberWithCommas(result.sc) + " 개";
 
 					tr.appendChild(tdName);
-					tr.appendChild(tdNewsCount);
+					tr.appendChild(tdDocCount);
 					tr.appendChild(tdFileSize);
 					tr.appendChild(tdWordCount);
 					tr.appendChild(tdSentenceCount);
-					tbNewsTotal.appendChild(tr);
+					tbDocTotal.appendChild(tr);
 				});
 			});
 		}
 
-		function loadNewsList(page) { //페이지의 뉴스 목록을 가져온다.
+		function loadDocList(page) { //시작 키로부터 10개의 doc 목록을 가져온다.
 			divMain.style.display = 'none';
-			newsTable.style.display = 'block';
-			initNewsTotalTable(false);
+			docTable.style.display = 'block';
+			initDocTotalTable(false);
 
-			if (page < 1) page = 1;
-			const size = 10; //행 최대개수
-			let newsName = "", newsCategory = "", newsDivision = "", startDate = "", endDate = "";
-			newsName = newsArgs["newsName"];
-			newsCategory = newsArgs["newsCategory"];
-			newsDivision = newsArgs["newsDivision"];
-			startDate = inputform_startDate.value;
-			endDate = inputform_endDate.value;
-
-			/* Load news count */
-			let dest = `newscorpus/count?newsName=${newsName}&newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
-			connect("GET", dest, null, null, function(readyState, status, response) {
-				if (readyState != 4 || status != 200) return;
-				let result = JSON.parse(response);
-				let count = result.count;
-
-				const spanNewsTotal = document.getElementById("newsTotal");
+			loadDocCountCallback = function(cloud, page, size, count, startKeys) {
+				const spanNewsTotal = document.getElementById("docTotal");
 				spanNewsTotal.innerText = numberWithCommas(count) + " 개";
-				const spanNewsFileSize = document.getElementById("newsFileSize");
-				spanNewsFileSize.innerText = numberWithCommas(Math.round(result.fs / 1024 * 10) / 10) + " KB";
-				const spanNewsWordCount = document.getElementById("newsWordCount");
-				spanNewsWordCount.innerText = numberWithCommas(result.wc) + " 개";
-				const spanNewsSentenceCount = document.getElementById("newsSentenceCount");
-				spanNewsSentenceCount.innerText = numberWithCommas(result.sc) + " 개";
+				// const spanNewsFileSize = document.getElementById("docFileSize");
+				// spanNewsFileSize.innerText = "0 KB";
+				// const spanNewsWordCount = document.getElementById("docWordCount");
+				// spanNewsWordCount.innerText = "0 개";
+				// const spanNewsSentenceCount = document.getElementById("docSentenceCount");
+				// spanNewsSentenceCount.innerText = "0 개";
 
 				const spanGoLastPage = document.getElementById("go_last_page");
 				spanGoLastPage.onclick = function(e) {
-					loadNewsList(Math.ceil(count / size));
+					loadDocList(Math.ceil(count / size));
 				};
 				const btnGroup = document.getElementById("page");
 				while (btnGroup.firstChild)
@@ -368,16 +315,16 @@
 					btn.style.width = '45px';
 					btn.style.fontSize = '0.8em';
 					btn.onclick = function(e) {
-						loadNewsList(i);
+						loadDocList(i);
 					};
 					btn.className = (i==page)? 'btn btn-secondary' : 'btn btn-outline-secondary';
 					/* Append */
 					btnGroup.appendChild(btn);
 				}
 
-				/* Load news list */
+				/* Load doc list */
 				const table = document.getElementById("list");
-				//id  url  newspaper  category  division  date  title text
+				//제목 클라우드 파일크기 단어수 문장수 파일저장
 				while (table.childElementCount > 1)
 					table.removeChild(table.lastChild);
 
@@ -388,65 +335,55 @@
 					document.getElementById("noData").style.display = 'none';
 				}
 
-				const dest = `newscorpus/list?page=${page}&size=${size}&newsName=${newsName}&newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
+				const dest = `doccorpus/list?startAfter=${startKeys[page - 1]}&size=${size}&cloud=${cloud}`;
 				connect("GET", dest, null, null, function(readyState, status, response) {
 					if (readyState != 4 || status != 200) return;
 
-					let rows = JSON.parse(response);
-					for (let i = 0; i < rows.length; i++) {
+					let data = JSON.parse(response);
+					let length = data.KeyCount;
+					let contents = data.Contents;
+
+					for (let i = 0; i < length; i++) {
 						/* Bind */
 						let tr = document.createElement("TR");
-						let tdId = document.createElement("TD");
 						let tdTit = document.createElement("TD");
-						let aTitUrl = document.createElement("A");
-						let tdNp = document.createElement("TD");
-						let tdCat = document.createElement("TD");
-						let tdDiv = document.createElement("TD");
-						let tdDat = document.createElement("TD");
+						let tdCl = document.createElement("TD");
 						let tdSize = document.createElement("TD");
 						let tdWc = document.createElement("TD");
 						let tdSc = document.createElement("TD");
 						let tdTxt = document.createElement("TD");
 						let aTxtUrl = document.createElement("A");
 						let iTxtIcon = document.createElement("I");
-
+						
 						/* Set row */
-						let row = rows[i];
-						tdId.innerText = row.id;
-						aTitUrl.innerText = row.title;
-						aTitUrl.href = row.url;
-						tdNp.innerText = row.newspaper;
-						tdCat.innerText = row.category;
-						tdDiv.innerText = row.division;
-						tdDat.innerText = row.date;
-						tdSize.innerText = `${row.textsize} B`;
-						tdWc.innerText = row.textwc;
-						tdSc.innerText = row.textsc;
-						if (row.texturl != "")
-							aTxtUrl.href = row.texturl;
-						aTxtUrl.download = `${row.date}-${row.title}.txt`;
+						let content = contents[i];
+						let title = decodeURI(content.Key.split('/')[1]);
+						let url = 'https://s3.ap-northeast-2.amazonaws.com/cloud.doc.hansung.ac.kr/' + content.Key;
+						tdTit.innerText = title;
+						tdCl.innerText = cloud;
+						tdSize.innerText = `${content.Size} B`;
+						tdWc.innerText = 0;
+						tdSc.innerText = 0;
+						if (url != "")
+							aTxtUrl.href = url;
+						aTxtUrl.download = "title.txt";
 						iTxtIcon.className = 'far fa-file-alt';
 						iTxtIcon.style = 'font-size:24px';
 
 						tr.onclick = function(e) {
-							selectItem(tr, row.id);
+							selectItem(tr, url);
 						};
 
 						tr.ondblclick = function(e) {
 							closeContent();
-							if (row.texturl != "") {
-								loadContent(row.title, row.texturl);
+							if (url != "") {
+								loadContent(title, url);
 							}
 						};
 
 						/* Append */
-						tr.appendChild(tdId);
-						tdTit.appendChild(aTitUrl);
 						tr.appendChild(tdTit);
-						tr.appendChild(tdNp);
-						tr.appendChild(tdCat);
-						tr.appendChild(tdDiv);
-						tr.appendChild(tdDat);
+						tr.appendChild(tdCl);
 						tr.appendChild(tdSize);
 						tr.appendChild(tdWc);
 						tr.appendChild(tdSc);
@@ -455,11 +392,30 @@
 						tr.appendChild(tdTxt);
 						table.appendChild(tr);
 					}
-				}); //load news list
-			}); //load news count
+				}); //load doc list
+			} //loadDocCountCallback
+
+			if (page < 1) page = 1;
+			const size = 10; //행 최대개수
+			let cloud = docArgs["cloud"];
+
+			if (page == 1) {
+				/* Load doc count */
+				let dest = `doccorpus/count?cloud=${cloud}&size=${size}`;
+				connect("GET", dest, null, null, function(readyState, status, response) {
+					if (readyState != 4 || status != 200) return;
+					let result = JSON.parse(response);
+					count = result.count;
+					startKeys = result.startKeys;
+
+					loadDocCountCallback(cloud, page, size, count, startKeys);
+				}); //load doc count
+			} else {
+				loadDocCountCallback(cloud, page, size, count, startKeys);
+			}
 		}
 
-		function loadContent(title, texturl) { //뉴스 내용을 가져온다.
+		function loadContent(title, texturl) { //내용을 가져온다.
 			showhideRightSideBox(true);
 
 			/* Get news text */
@@ -474,7 +430,7 @@
 				});
 		}
 
-		function closeContent() { //뉴스 내용 창을 닫는다.
+		function closeContent() { //내용 창을 닫는다.
 			showhideRightSideBox(false);
 			btnCloseContent.style.display = 'none';
 			while (divTitle.firstChild)
@@ -484,37 +440,26 @@
 		}
 
 		function downloadContent() {
-			let newsName = newsArgs["newsName"];
-			let newsCategory = newsArgs["newsCategory"];
-			let newsDivision = newsArgs["newsDivision"];
-			let startDate = inputform_startDate.value;
-			let endDate = inputform_endDate.value;
+			let cloud = docArgs["cloud"];
 
 			/* Download news contents */
-			let dest = `newscorpus/download?newsName=${newsName}&newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
+			let dest = `doccorpus/download?cloud=${cloud}`;
 
 			let headers = [
 				{'name': 'Content-Type', 'value': 'application/json'}
 			];
 
 			let body = null;
-			let currentKey = null; //선택한 항목 종류 (제목or분류1or분류2or뉴스이름)
-			if (categories[newsName] != undefined && categories[newsName].length == 0) { //newsName 있으면
-				currentKey = "newsName";
-			} else if (divisions[newsName][newsCategory] == undefined) { //newsCategory 있으면
-				currentKey = "newsCategory";
-			} else if (divisions[newsName][newsCategory].length != 0 && newsDivision == "") { //newsDivision 목록이 더 있으면
-				currentKey = "newsDivision";
-			} else { //newsDivision 목록이 없으면 newsId (Ex. reuters)
-				currentKey = "newsId";
-			}
+			let currentKey = null; //선택한 항목 종류 (cloud or docId)
+			// TODO: cloud, docId 위치 구분
+
 			if (selectedItems.length != 0)
 				body = `{"key": "${currentKey}", "selectedItems": ["${selectedItems.join('", "')}"]}`;
 
 			connect("POST", dest, headers, body, function(readyState, status, response) {
 				if (readyState != 4) return;
 				if (status == 203) {
-					alert('1개 이상 10000개 이하의 항목만 내려받을 수 있습니다. 나눠서 받으려면 날짜 필터를 사용해주세요.');
+					alert('1개 이상 항목만 내려받을 수 있습니다.');
 					return;
 				}
 				if (status != 200) return;
