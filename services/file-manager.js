@@ -35,6 +35,10 @@ class FileManager {
             }
 
             // S3 저장
+            /* S3에 파일을 그대로 올리면 메타데이터가 text/plain으로 업로드되지만
+             * stream으로 올리면 application/octet-stream으로 업로드되어
+             * 파일 다운로드 시 새 창에서 열리는 것을 방지할 수 있다.
+             */
             this.params.Key = `${dirpath}/${filename}`;
             this.params.Body = fs.createReadStream(localFilePath);
             this.s3.upload(this.params, (err, data) => {

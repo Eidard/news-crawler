@@ -27,6 +27,7 @@ function getDocList(startAfter, size, query, reqCallback) {
 }
 
 function getZipFile(query, key, selectedItems, sessionID, reqCallback) {
+    // TODO: Archive selectedItems
     reqCallback(1, null);
     // reqCallback(0, `${sessionID}.zip`);
 }

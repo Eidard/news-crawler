@@ -9,17 +9,28 @@
 	<!-- link -->
 	<div class="navbar-collapse collapse" id="main_nav">
 		<ul class="navbar-nav">
-			<li class="nav-item">
-				<a class="nav-link" id="nav-newscrawling" href="/newscrawling">뉴스크롤러</a>
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle"
+					href="#"
+					id="nav-crawling"
+					data-toggle="dropdown">크롤링</a>
+
+				<div class="dropdown-menu">
+					<a class="dropdown-item" id="nav-newscrawling" href="/newscrawling">뉴스크롤러</a>
+					<a class="dropdown-item" id="nav-doccrawling" href="/doccrawling">DOC크롤러</a>
+				</div>
 			</li>
-			<li class="nav-item">
-				<a class="nav-link" id="nav-doccrawling" href="/doccrawling">DOC크롤러</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" id="nav-newscorpus" href="/newscorpus">뉴스말뭉치확인</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" id="nav-doccorpus" href="/doccorpus">DOC말뭉치확인</a>
+
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle"
+					href="#"
+					id="nav-corpus"
+					data-toggle="dropdown">수집 결과</a>
+
+				<div class="dropdown-menu">
+					<a class="dropdown-item" id="nav-newscorpus" href="/newscorpus">뉴스말뭉치확인</a>
+					<a class="dropdown-item" id="nav-doccorpus" href="/doccorpus">DOC말뭉치확인</a>
+				</div>
 			</li>
 		</ul>
 	</div>

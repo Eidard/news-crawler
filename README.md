@@ -19,12 +19,13 @@
     "db": {
         "host": "db url",
         "port": "3306",
-        "database": "newsdatas",
+        "database": "schema name",
         "user": "username",
         "password": "password"
     },
     "s3": {
-        "Bucket": "bucket url"
+        "doc": "doc bucket url",
+        "news": "news bucket url"
     }
 }
 ```
