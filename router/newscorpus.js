@@ -50,7 +50,7 @@ function getNewsCount(query, startDate, endDate, reqCallback) {
         if (sqlWhere.length != 0)
             sqlWhere = 'WHERE ' + sqlWhere;
 
-        var sql = `SELECT count(*) as count, sum(textsize) as fs, sum(textwc) as wc, sum(textsc) as sc FROM ${database.TABLE_NAME} ${sqlWhere};`;
+        var sql = `SELECT count(*) as count, sum(textsize) as fs, sum(textwc) as wc, sum(textsc) as sc, min(date) as minDate, max(date) as maxDate FROM ${database.TABLE_NAME} ${sqlWhere};`;
         database.query(connection, sql, null, dbQueryCallback);
     }
 

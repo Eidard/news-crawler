@@ -64,11 +64,17 @@
 				</div>
 				<span class="form-control" id="newsWordCount">0</span>
 			</div>
-			<div class="input-group my-1">
+			<div class="input-group my-1 mr-1">
 				<div class="input-group-prepend">
 					<span class="input-group-text">문장 수</label>
 				</div>
 				<span class="form-control" id="newsSentenceCount">0</span>
+			</div>
+			<div class="input-group my-1">
+				<div class="input-group-prepend">
+					<span class="input-group-text">기간</label>
+				</div>
+				<span class="form-control" id="newsDate">0</span>
 			</div>
 		</form>
 		
@@ -348,6 +354,8 @@
 				spanNewsWordCount.innerText = numberWithCommas(result.wc) + " 개";
 				const spanNewsSentenceCount = document.getElementById("newsSentenceCount");
 				spanNewsSentenceCount.innerText = numberWithCommas(result.sc) + " 개";
+				const spanNewsDate = document.getElementById("newsDate");
+				spanNewsDate.innerText = result.minDate + " ~ " + result.maxDate;
 
 				const spanGoLastPage = document.getElementById("go_last_page");
 				spanGoLastPage.onclick = function(e) {
