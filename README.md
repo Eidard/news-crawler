@@ -103,14 +103,15 @@ CREATE TABLE `news` (
 
 ## 실행
 
-- Launch
+- Launch on cli
 > $ npm start<br>
-※ Launch on background
+
+- Launch on background
 > $ sudo nohup npm start &<br>
 
-- Check
-> localhost:50000<br>
-
+- Launch using Docker
+> $ docker build -t news-crawler
+> $ docker run -d -p {prefer_port}:50000 news-crawler
 
 ## 실행화면
 <table>
