@@ -270,11 +270,11 @@
 			let suffix = "";
 			let suffixKey = "";
 			if (newsName != "") {
-				suffix += `?newsName=${newsName}`;
+				suffix += `?newsName=${encodeURI(newsName)}`;
 				if (newsCategory != "") {
-					suffix += `&newsCategory=${newsCategory}`;
+					suffix += `&newsCategory=${encodeURI(newsCategory)}`;
 					if (newsDivision != "") {
-						suffix += `&newsDivision=${newsDivision}`;
+						suffix += `&newsDivision=${encodeURI(newsDivision)}`;
 					} else {
 						suffixKey = "&newsDivision=";
 					}
@@ -288,7 +288,7 @@
 			initNewsTotalTable(true);
 
 			folderList.forEach(val => {
-				let dest = `newscorpus/count${suffix}${suffixKey}${val}`;
+				let dest = `newscorpus/count${suffix}${suffixKey}${encodeURI(val)}`;
 				connect("GET", dest, null, null, function(readyState, status, response) {
 					if (readyState != 4) return;
 					let spinner = document.getElementById(`spinner_${val}`);
@@ -340,7 +340,13 @@
 			endDate = inputform_endDate.value;
 
 			/* Load news count */
-			let dest = `newscorpus/count?newsName=${newsName}&newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
+			let dest = "newscorpus/count" + toQueryString({
+				"newsName": newsName,
+				"newsCategory": newsCategory,
+				"newsDivision": newsDivision,
+				"startDate": startDate,
+				"endDate": endDate
+			});
 			connect("GET", dest, null, null, function(readyState, status, response) {
 				if (readyState != 4 || status != 200) return;
 				let result = JSON.parse(response);
@@ -397,7 +403,15 @@
 					document.getElementById("noData").style.display = 'none';
 				}
 
-				const dest = `newscorpus/list?page=${page}&size=${size}&newsName=${newsName}&newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
+				let dest = "newscorpus/list" + toQueryString({
+					"page": page,
+					"size": size,
+					"newsName": newsName,
+					"newsCategory": newsCategory,
+					"newsDivision": newsDivision,
+					"startDate": startDate,
+					"endDate": endDate
+				});
 				connect("GET", dest, null, null, function(readyState, status, response) {
 					if (readyState != 4 || status != 200) return;
 
@@ -500,7 +514,13 @@
 			let endDate = inputform_endDate.value;
 
 			/* Download news contents */
-			let dest = `newscorpus/download?newsName=${newsName}&newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
+			let dest = "newscorpus/download" + toQueryString({
+				"newsName": newsName,
+				"newsCategory": newsCategory,
+				"newsDivision": newsDivision,
+				"startDate": startDate,
+				"endDate": endDate
+			});
 
 			let headers = [
 				{'name': 'Content-Type', 'value': 'application/json'}

@@ -115,7 +115,12 @@
 			const newsDivision = inputform_selDivision.options[inputform_selDivision.selectedIndex].value;
 			const startDate = calStartDate.value;
 			const endDate = calEndDate.value;
-			const dest = `newscrawling/${newsName}?newsCategory=${newsCategory}&newsDivision=${newsDivision}&startDate=${startDate}&endDate=${endDate}`;
+			let dest = `newscrawling/${newsName}` + toQueryString({
+				"newsCategory": newsCategory,
+				"newsDivision": newsDivision,
+				"startDate": startDate,
+				"endDate": endDate
+			});
 
 			connect("GET", dest, null, null, function(readyState, status, response) {
 				if (readyState != 4 || status != 200)

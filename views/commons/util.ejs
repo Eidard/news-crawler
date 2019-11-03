@@ -1,9 +1,21 @@
 <script type="text/javascript">
 
-	function numberWithCommas(x) {
+	function numberWithCommas(x) { //문자열 타입의 숫자에 천 자리 쉼표 추가
 		var parts = x.toString().split(".");
 		parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 		return parts.join(".");
+	}
+
+	function toQueryString(queryObj) { //queryObj를 URL 쿼리 문자열로 변환
+		let query = "";
+		Object.keys(queryObj).forEach(key => {
+			// 쿼리의 값은 인코딩해서 보낸다. ('& ?' 문자, 한글 처리)
+			query += `${key}=${encodeURI(queryObj[key])}&`;
+		});
+		if (query.length > 0)
+			return '?' + query.substring(0, lastIndexOf('&'));
+		else
+			return "";
 	}
 
 	/* Http Server */

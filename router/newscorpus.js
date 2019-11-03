@@ -199,12 +199,12 @@ module.exports = function (app) {
     app.get('/newscorpus/count', function (req, res) {
         console.log(req.route.path);
         query = {
-            'newspaper': req.query.newsName,
-            'category': req.query.newsCategory,
-            'division': req.query.newsDivision,
+            'newspaper': decodeURI(req.query.newsName),
+            'category': decodeURI(req.query.newsCategory),
+            'division': decodeURI(req.query.newsDivision),
         }
-        startDate = req.query.startDate;
-        endDate = req.query.endDate;
+        startDate = decodeURI(req.query.startDate);
+        endDate = decodeURI(req.query.endDate);
 
         getNewsCount(query, startDate, endDate, function (err, result) {
             if (err) {
@@ -217,15 +217,15 @@ module.exports = function (app) {
 
     app.get('/newscorpus/list', function (req, res) {
         console.log(req.route.path);
-        page = req.query.page;
-        size = req.query.size;
+        page = decodeURI(req.query.page);
+        size = decodeURI(req.query.size);
         query = {
-            'newspaper': req.query.newsName,
-            'category': req.query.newsCategory,
-            'division': req.query.newsDivision,
+            'newspaper': decodeURI(req.query.newsName),
+            'category': decodeURI(req.query.newsCategory),
+            'division': decodeURI(req.query.newsDivision),
         }
-        startDate = req.query.startDate;
-        endDate = req.query.endDate;
+        startDate = decodeURI(req.query.startDate);
+        endDate = decodeURI(req.query.endDate);
 
         getNewsList(page, size, query, startDate, endDate, function (err, rows) {
             if (err) {
@@ -239,12 +239,12 @@ module.exports = function (app) {
     app.post('/newscorpus/download', function (req, res) {
         console.log(req.route.path);
         query = {
-            'newspaper': req.query.newsName,
-            'category': req.query.newsCategory,
-            'division': req.query.newsDivision,
+            'newspaper': decodeURI(req.query.newsName),
+            'category': decodeURI(req.query.newsCategory),
+            'division': decodeURI(req.query.newsDivision),
         }
-        startDate = req.query.startDate;
-        endDate = req.query.endDate;
+        startDate = decodeURI(req.query.startDate);
+        endDate = decodeURI(req.query.endDate);
 
         mapper = {
             'newsName': 'newspaper',

@@ -19,10 +19,10 @@ module.exports = function (app) {
     for (let i = 0; i < newsNames.length; i++) {
         app.get(`/newscrawling/${newsNames[i]}`, function (req, res) {
             console.log(req.route.path);
-            newsCategory = req.query.newsCategory;
-            newsDivision = req.query.newsDivision;
-            startDate = req.query.startDate;
-            endDate = req.query.endDate;
+            newsCategory = decodeURI(req.query.newsCategory);
+            newsDivision = decodeURI(req.query.newsDivision);
+            startDate = decodeURI(req.query.startDate);
+            endDate = decodeURI(req.query.endDate);
             sessionId = req.sessionID;
 
             // response with pipe
