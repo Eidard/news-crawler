@@ -5,6 +5,7 @@ const fs = require('fs');
 const archiver = require('archiver');
 const Database = require('./../services/database');
 const FileManager = require('./../services/file-manager');
+const util = require('./util');
 
 const database = new Database();
 const fileManager = new FileManager();
@@ -122,7 +123,7 @@ function getZipFile(query, startDate, endDate, key, selectedItems, sessionID, re
         let obsList = [];
         rows.forEach(row => {
             let dirpath;
-            if (row.division != '')
+            if (row.division != undefined && row.division != '')
                 dirpath = `${sessionID}/${row.newspaper}/${row.category}/${row.division}`;
             else
                 dirpath = `${sessionID}/${row.newspaper}/${row.category}`;
@@ -198,15 +199,16 @@ function getZipFile(query, startDate, endDate, key, selectedItems, sessionID, re
 module.exports = function (app) {
     app.get('/newscorpus/count', function (req, res) {
         console.log(req.route.path);
-        query = {
-            'newspaper': decodeURI(req.query.newsName),
-            'category': decodeURI(req.query.newsCategory),
-            'division': decodeURI(req.query.newsDivision),
-        }
-        startDate = decodeURI(req.query.startDate);
-        endDate = decodeURI(req.query.endDate);
-
-        getNewsCount(query, startDate, endDate, function (err, result) {
+        query = util.decodeQuery(req.query);
+        
+        let sqlQuery = {
+            'newspaper': query.newsName,
+            'category': query.newsCategory,
+            'division': query.newsDivision
+        };
+        let startDate = req.query.startDate;
+        let endDate = req.query.endDate;
+        getNewsCount(sqlQuery, startDate, endDate, function (err, result) {
             if (err) {
                 res.status(203).end();
                 return;
@@ -217,17 +219,18 @@ module.exports = function (app) {
 
     app.get('/newscorpus/list', function (req, res) {
         console.log(req.route.path);
-        page = decodeURI(req.query.page);
-        size = decodeURI(req.query.size);
-        query = {
-            'newspaper': decodeURI(req.query.newsName),
-            'category': decodeURI(req.query.newsCategory),
-            'division': decodeURI(req.query.newsDivision),
-        }
-        startDate = decodeURI(req.query.startDate);
-        endDate = decodeURI(req.query.endDate);
+        query = util.decodeQuery(req.query);
 
-        getNewsList(page, size, query, startDate, endDate, function (err, rows) {
+        page = query.page;
+        size = query.size;
+        let sqlQuery = {
+            'newspaper': query.newsName,
+            'category': query.newsCategory,
+            'division': query.newsDivision
+        }
+        startDate = query.startDate;
+        endDate = query.endDate;
+        getNewsList(page, size, sqlQuery, startDate, endDate, function (err, rows) {
             if (err) {
                 res.status(203).end();
                 return;
@@ -238,28 +241,31 @@ module.exports = function (app) {
 
     app.post('/newscorpus/download', function (req, res) {
         console.log(req.route.path);
-        query = {
-            'newspaper': decodeURI(req.query.newsName),
-            'category': decodeURI(req.query.newsCategory),
-            'division': decodeURI(req.query.newsDivision),
-        }
-        startDate = decodeURI(req.query.startDate);
-        endDate = decodeURI(req.query.endDate);
+        query = util.decodeQuery(req.query);
 
-        mapper = {
+        startDate = query.startDate;
+        endDate = query.endDate;
+
+        let sqlQuery = {
+            'newspaper': query.newsName,
+            'category': query.newsCategory,
+            'division': query.newsDivision
+        }
+
+        let sqlColumnMapper = {
             'newsName': 'newspaper',
             'newsCategory': 'category',
             'newsDivision': 'division',
             'newsId': 'id'
-        }
-        key = mapper[req.body.key];
+        };
+        key = sqlColumnMapper[req.body.key];
         selectedItems = req.body.selectedItems;
         if (selectedItems == undefined || selectedItems.length == 0) {
             res.status(203).send().end();
             return;
         }
 
-        getZipFile(query, startDate, endDate, key, selectedItems, req.sessionID, function (err, filepath) {
+        getZipFile(sqlQuery, startDate, endDate, key, selectedItems, req.sessionID, function (err, filepath) {
             if (err) {
                 res.status(203).end();
                 return;

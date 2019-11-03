@@ -10,10 +10,14 @@
 		let query = "";
 		Object.keys(queryObj).forEach(key => {
 			// 쿼리의 값은 인코딩해서 보낸다. ('& ?' 문자, 한글 처리)
-			query += `${key}=${encodeURI(queryObj[key])}&`;
+			let val = queryObj[key];
+			if (val != undefined && val != '')
+				query += `${key}=${encodeURIComponent(val)}&`;
+			else
+				query += `${key}=&`;
 		});
 		if (query.length > 0)
-			return '?' + query.substring(0, lastIndexOf('&'));
+			return '?' + query.substring(0, query.lastIndexOf('&'));
 		else
 			return "";
 	}

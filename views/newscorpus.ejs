@@ -270,11 +270,11 @@
 			let suffix = "";
 			let suffixKey = "";
 			if (newsName != "") {
-				suffix += `?newsName=${encodeURI(newsName)}`;
+				suffix += `?newsName=${encodeURIComponent(newsName)}`;
 				if (newsCategory != "") {
-					suffix += `&newsCategory=${encodeURI(newsCategory)}`;
+					suffix += `&newsCategory=${encodeURIComponent(newsCategory)}`;
 					if (newsDivision != "") {
-						suffix += `&newsDivision=${encodeURI(newsDivision)}`;
+						suffix += `&newsDivision=${encodeURIComponent(newsDivision)}`;
 					} else {
 						suffixKey = "&newsDivision=";
 					}
@@ -288,7 +288,7 @@
 			initNewsTotalTable(true);
 
 			folderList.forEach(val => {
-				let dest = `newscorpus/count${suffix}${suffixKey}${encodeURI(val)}`;
+				let dest = `newscorpus/count${suffix}${suffixKey}${encodeURIComponent(val)}`;
 				connect("GET", dest, null, null, function(readyState, status, response) {
 					if (readyState != 4) return;
 					let spinner = document.getElementById(`spinner_${val}`);

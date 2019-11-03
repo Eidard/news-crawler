@@ -234,8 +234,8 @@ class Crawler {
     }
 
     getDatePercentage(curDate) {
-        if (curDate > endDate) return 0;
-        if (curDate <= startDate) return 100;
+        if (curDate > this.endDate) return 0;
+        if (curDate <= this.startDate) return 100;
 
         const splitDate = (date) => { return [date.substring(0, 4), date.substring(5, 7), date.substring(8, 10)]; }
         const subDate = (s, e) => { return (e[2] - s[2]) * 1 + (e[1] - s[1]) * 31 + (e[0] - s[0]) * 365; }

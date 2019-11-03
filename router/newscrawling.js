@@ -3,6 +3,7 @@ const JoongangCrawler = require('./../crawlers/joongang-crawler');
 // const MkCrawler = require('./../crawlers/mk-crawler');
 const ReutersCrawler = require('./../crawlers/reuters-crawler');
 const FileManager = require('./../services/file-manager');
+var util = require('./util');
 
 const fileManager = new FileManager();
 
@@ -19,16 +20,13 @@ module.exports = function (app) {
     for (let i = 0; i < newsNames.length; i++) {
         app.get(`/newscrawling/${newsNames[i]}`, function (req, res) {
             console.log(req.route.path);
-            newsCategory = decodeURI(req.query.newsCategory);
-            newsDivision = decodeURI(req.query.newsDivision);
-            startDate = decodeURI(req.query.startDate);
-            endDate = decodeURI(req.query.endDate);
+            let query = util.decodeQuery(req.query);
             sessionId = req.sessionID;
 
             // response with pipe
             let pipeRow = {
-                "newspaper": newsNames[i], "newsCategory": newsCategory, "newsDivision": newsDivision,
-                "startDate": startDate, "endDate": endDate,
+                "newspaper": newsNames[i], "newsCategory": query.newsCategory, "newsDivision": query.newsDivision,
+                "startDate": query.startDate, "endDate": query.endDate,
                 "percent": 0, "total": 0
             };
             fileManager.updatePipe(sessionId, pipeRow, (path, exist) => {
@@ -40,7 +38,7 @@ module.exports = function (app) {
 
                 if (exist) return; //이미 같은 세션에서 같은 크롤링 요청을 처리 중인 파이프가 존재하면 새로 크롤링하지 않는다.
 
-                newsCrawlers[newsNames[i]](newsCategory, newsDivision, startDate, endDate, sessionId)
+                newsCrawlers[newsNames[i]](pipeRow.newsCategory, pipeRow.newsDivision, pipeRow.startDate, pipeRow.endDate, sessionId)
                     .updateCrawling(function(err) {
                         if (err) {
                             console.log('crawling stopped');
