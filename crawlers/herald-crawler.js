@@ -2,7 +2,6 @@ const cheerio = require('cheerio'); //html 페이지 크롤링
 
 const Crawler = require('./crawler');
 
-
 class HeraldCrawler extends Crawler {
 
     constructor(newsCategory, newsDivision, startDate, endDate, sessionId) {
@@ -10,6 +9,7 @@ class HeraldCrawler extends Crawler {
         this.categoryIds = {
             'National': '01',
             'Business': '02',
+            'Finance' : '19',
             'Life&Style': '03',
             'Entertainment': '04',
             'Sports': '05',
@@ -28,11 +28,17 @@ class HeraldCrawler extends Crawler {
                 'Education': '09000000'
             },
             'Business': {
-                'Economy': '01000000',
-                'Finance': '02000000',
+                //'Economy': '01000000', moved to Category-Finance
+                //'Finance': '02000000', changed as Category
                 'Industry': '03000000',
                 'Technology': '06000000',
-                'Automode': '056000000'
+                'Automode': '05000000', // named changed. current name is 'Transport'
+                'Retail' : '10000000'
+            },
+            'Finance' : {
+                'Economy' : '01000000',
+                'Market' : '02000000',
+                'Money' : '03000000'
             },
             'Life&Style': {
                 'Culture': '07000000',
@@ -49,7 +55,8 @@ class HeraldCrawler extends Crawler {
                 'Film': '01000000',
                 'Television': '02000000',
                 'Music': '03000000',
-                'Theater': '04000000'
+                'Theater': '04000000',
+                'K-pop' : '09000000'
             },
             'Sports': {
                 'Soccer': '01000000',
@@ -72,26 +79,30 @@ class HeraldCrawler extends Crawler {
         let divisionId = this.divisionIds[newsCategory][newsDivision];
         if (divisionId == undefined)
             return null;
-        return "http://www.koreaherald.com/list.php?ct=02" + categoryId + divisionId + "&ctv=0&np=" + page;
+        return "http://www.koreaherald.com/list.php?ct=02"
+            + categoryId + divisionId + "&ctv=0&np=" + page;
     }
 
     parsePage(body, page) {
         let $ = cheerio.load(body);
         let rows = [];
 
+        let s = 0, e = 15;
+
+        /*
         let s = 1, e = 15;
         if (page == 1) {
             s = 0, e = 14;
-            let newsTitle = $('.fontTitle6 ').eq(1).text().trim();
-            let newsUrl = 'http://www.koreaherald.com' + $('.fontTitle6 ').eq(1).attr("href");
+            let newsTitle = $('.main_l_t1').eq(1).text().trim();
+            let newsUrl = 'http://www.koreaherald.com' + $('.main_sec_li > li>a').eq(1).attr("href");
             let newsDate = this.formatDate(newsUrl.substring(39, 47));
             if (newsDate != null)
                 rows.push([newsTitle, newsUrl, newsDate]);
         }
-
+         */
         for (let i = s; i < e; i++) {
-            let newsTitle = $('.fontTitle3 ').eq(i).text().trim();
-            let newsUrl = 'http://www.koreaherald.com' + $('.fontTitle3 ').eq(i).attr("href");
+            let newsTitle = $('.main_l_t1').eq(i).text().trim();
+            let newsUrl = 'http://www.koreaherald.com' + $('.main_sec_li > li>a').eq(i).attr("href");
             let newsDate = this.formatDate(newsUrl.substring(39, 47));
             if (newsDate != null)
                 rows.push([newsTitle, newsUrl, newsDate]);
