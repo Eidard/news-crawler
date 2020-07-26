@@ -8,11 +8,57 @@ class ReutersCrawler extends Crawler {
     constructor(newsCategory, newsDivision, startDate, endDate, sessionId) {
         super("reuters", newsCategory, newsDivision, startDate, endDate, sessionId);
         this.categoryIds = {
-            'Banks': 'banks',
-            'Business News': 'businessNews',
-            'Politics': 'politicsNews',
-            'Supreme Court': 'supreme-court',
-            'U.S': 'domesticNews'
+            'Business' : 'Business',
+            'Markets' : 'Markets',
+            'World' : 'World',
+            'Politics News' : 'Politics',
+            'Tech' : 'Tech',
+            'BreakingViews' : 'BreakingViews',
+            'Wealth' : 'Wealth',
+            'Life' : 'Life',
+            'Big Story' : 'Big Story'
+        };
+        this.divisionIds = {
+            'Business' : {
+                'Business' : 'businessnews',
+                'Deals' : 'innovationNews',
+                'Finance' : 'banks',
+                'Sustainable Business' : 'esgnews'
+            },
+            'Markets' : {
+                'Markets' : 'marketsNews',
+                'Commodities' : 'GCA-Commodities'
+            },
+            'World' :{
+                'World' : 'worldNews',
+                'U.S' : 'domesticNews',
+                'Special Reports' : 'specialReports'
+            },
+            'Politics News' : {
+                'Politics' : 'politicsNews'
+            },
+            'Tech' : {
+                'Technology' : 'technologyNews',
+                'Science' : 'scienceNews',
+                'Media' : 'medianews',
+                'Energy and Environment' : 'environmentNews'
+            },
+            'BreakingViews' : {
+                'BreakingViews' : 'mcBreakingviews'
+            },
+            'Wealth' : {
+                'Wealth' : 'PersonalFinance'
+            },
+            'Life' : {
+                'Health' : 'healthNews',
+                'Sports' : 'sportsNews',
+                'Arts' : 'artsNews',
+                'Entertainment' : 'entertainmentNews',
+                'Oddly Enough' :  'oddlyEnoughNews'
+            },
+            'Big Story' : {
+                'Big Story' : 'BigStory10'
+            }
         }
     }
 
@@ -20,7 +66,10 @@ class ReutersCrawler extends Crawler {
         let categoryId = this.categoryIds[newsCategory];
         if (categoryId == undefined)
             return null;
-        return "https://www.reuters.com/news/archive/" + categoryId + "?view=page&page=" + page + "&pageSize=10";
+        let divisionId = this.divisionIds[newsCategory][newsDivision];
+        if(divisionId == undefined)
+            return null;
+        return "https://www.reuters.com/news/archive/" + divisionId + "?view=page&page=" + page + "&pageSize=10";
     }
 
     parsePage(body, page) {
